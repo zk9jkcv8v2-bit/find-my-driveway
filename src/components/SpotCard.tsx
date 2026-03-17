@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Star, Zap, Shield, MapPin, Navigation } from "lucide-react";
+import { Star, Zap, Shield, MapPin, Navigation, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { SpotMarker } from "./MapView";
 
@@ -7,6 +7,7 @@ interface SpotCardProps {
   spot: SpotMarker;
   onBook: (spot: SpotMarker) => void;
   onNavigate: (spot: SpotMarker) => void;
+  onChat?: (spot: SpotMarker) => void;
   compact?: boolean;
 }
 
