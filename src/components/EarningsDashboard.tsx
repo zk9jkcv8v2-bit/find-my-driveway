@@ -222,23 +222,23 @@ export default function EarningsDashboard() {
         <p className="font-display font-extrabold text-3xl text-foreground mb-4">${displayTotal}</p>
 
         {/* Chart */}
-        <div className="flex items-end gap-[6px] h-20">
-          {earnings.map((day, i) => (
-            <motion.div
-              key={`${period}-${day.day}`}
-              className="flex-1 flex flex-col items-center gap-1"
-              initial={{ scaleY: 0 }}
-              animate={{ scaleY: 1 }}
-              transition={{ delay: 0.1 + i * 0.04 }}
-              style={{ transformOrigin: "bottom" }}
-            >
-              <div
-                className="w-full rounded-lg bg-primary transition-all duration-300"
-                style={{ height: `${(day.amount / maxAmount) * 100}%` }}
-              />
-              <span className="text-[9px] text-muted-foreground font-medium">{day.day}</span>
-            </motion.div>
-          ))}
+        <div className="flex items-end gap-[6px] h-24">
+          {earnings.map((day, i) => {
+            const barHeight = Math.round((day.amount / maxAmount) * 80);
+            return (
+              <div key={`${period}-${day.day}`} className="flex-1 flex flex-col items-center gap-1.5">
+                <div className="flex-1 w-full flex items-end">
+                  <motion.div
+                    className="w-full rounded-lg bg-primary"
+                    initial={{ height: 0 }}
+                    animate={{ height: barHeight }}
+                    transition={{ delay: 0.1 + i * 0.04, type: "spring", stiffness: 300, damping: 25 }}
+                  />
+                </div>
+                <span className="text-[9px] text-muted-foreground font-medium">{day.day}</span>
+              </div>
+            );
+          })}
         </div>
       </motion.div>
 
