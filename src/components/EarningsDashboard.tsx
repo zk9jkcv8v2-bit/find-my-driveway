@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { TrendingUp, Calendar, DollarSign, ArrowUpRight, ArrowLeft, Check, CreditCard, Clock, ChevronRight } from "lucide-react";
+import { TrendingUp, Calendar, DollarSign, ArrowUpRight, ArrowLeft, Check, CreditCard, Clock, ChevronRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 
@@ -34,11 +34,140 @@ const PAST = [
 
 type SubScreen = "main" | "all-bookings" | "withdraw";
 
+/* ── Animated counter hook ── */
+function useCountUp(target: number, duration = 1200, delay = 0) {
+  const [value, setValue] = useState(0);
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      const start = performance.now();
+      const tick = (now: number) => {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        // ease-out cubic
+        const eased = 1 - Math.pow(1 - progress, 3);
+        setValue(Math.round(eased * target));
+        if (progress < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }, delay);
+    return () => clearTimeout(timeout);
+  }, [target, duration, delay]);
+  return value;
+}
+
+/* ── Progress Ring ── */
+function ProgressRing({ percent, size = 80, stroke = 6 }: { percent: number; size?: number; stroke?: number }) {
+  const radius = (size - stroke) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const [offset, setOffset] = useState(circumference);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setOffset(circumference - (percent / 100) * circumference);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [percent, circumference]);
+
+  return (
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="-rotate-90">
+        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="hsl(var(--secondary))" strokeWidth={stroke} />
+        <circle
+          cx={size / 2} cy={size / 2} r={radius} fill="none"
+          stroke="url(#ringGradient)" strokeWidth={stroke}
+          strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={offset}
+          className="transition-all duration-1000 ease-out"
+        />
+        <defs>
+          <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="hsl(var(--primary))" />
+            <stop offset="100%" stopColor="hsl(var(--accent))" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="font-display font-extrabold text-sm text-foreground">{percent}%</span>
+      </div>
+    </div>
+  );
+}
+
+/* ── Confetti burst ── */
+function ConfettiBurst() {
+  const particles = Array.from({ length: 16 }, (_, i) => {
+    const angle = (i / 16) * 360;
+    const distance = 40 + Math.random() * 30;
+    const x = Math.cos((angle * Math.PI) / 180) * distance;
+    const y = Math.sin((angle * Math.PI) / 180) * distance;
+    const colors = ["hsl(var(--primary))", "hsl(var(--accent))", "hsl(var(--warning))", "hsl(var(--primary))"];
+    return { x, y, color: colors[i % colors.length], size: 4 + Math.random() * 4, delay: Math.random() * 0.15 };
+  });
+
+  return (
+    <div className="absolute inset-0 pointer-events-none">
+      {particles.map((p, i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full"
+          style={{ width: p.size, height: p.size, backgroundColor: p.color, left: "50%", top: "50%", marginLeft: -p.size / 2, marginTop: -p.size / 2 }}
+          initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
+          animate={{ x: p.x, y: p.y, opacity: 0, scale: 0.3 }}
+          transition={{ duration: 0.7, delay: p.delay, ease: "easeOut" }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/* ── Bar chart tooltip ── */
+function ChartBar({ day, amount, maxAmount, index, period }: { day: string; amount: number; maxAmount: number; index: number; period: string }) {
+  const [showTooltip, setShowTooltip] = useState(false);
+  const barHeight = Math.round((amount / maxAmount) * 80);
+  const isMax = amount === maxAmount;
+
+  return (
+    <div className="flex-1 flex flex-col items-center gap-1.5 relative">
+      <AnimatePresence>
+        {showTooltip && (
+          <motion.div
+            className="absolute -top-8 bg-foreground text-background text-[10px] font-bold px-2 py-0.5 rounded-md z-10 whitespace-nowrap"
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 4 }}
+          >
+            ${amount}
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <div
+        className="flex-1 w-full flex items-end cursor-pointer"
+        onMouseEnter={() => setShowTooltip(true)}
+        onMouseLeave={() => setShowTooltip(false)}
+        onTouchStart={() => setShowTooltip(true)}
+        onTouchEnd={() => setTimeout(() => setShowTooltip(false), 1200)}
+      >
+        <motion.div
+          className="w-full rounded-lg relative overflow-hidden"
+          style={{
+            background: "linear-gradient(to top, hsl(var(--primary)), hsl(var(--accent)))",
+            boxShadow: isMax ? "0 0 12px hsl(var(--accent) / 0.4)" : "none",
+          }}
+          initial={{ height: 0 }}
+          animate={{ height: barHeight }}
+          transition={{ delay: 0.1 + index * 0.04, type: "spring", stiffness: 300, damping: 25 }}
+        />
+      </div>
+      <span className="text-[9px] text-muted-foreground font-medium">{day}</span>
+    </div>
+  );
+}
+
 export default function EarningsDashboard() {
   const [period, setPeriod] = useState<"week" | "month">("week");
   const [subScreen, setSubScreen] = useState<SubScreen>("main");
   const [withdrawing, setWithdrawing] = useState(false);
   const [withdrawn, setWithdrawn] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const earnings = period === "week" ? MOCK_EARNINGS_WEEKLY : MOCK_EARNINGS_MONTHLY;
   const maxAmount = Math.max(...earnings.map((e) => e.amount));
@@ -46,16 +175,22 @@ export default function EarningsDashboard() {
   const totalMonth = 1842;
   const displayTotal = period === "week" ? totalWeek : totalMonth;
 
+  const animatedTotal = useCountUp(displayTotal, 1400, 200);
+  const animatedMonth = useCountUp(1842, 1200, 300);
+  const animatedBookings = useCountUp(23, 800, 400);
+
   const handleWithdraw = () => {
     setWithdrawing(true);
     setTimeout(() => {
       setWithdrawing(false);
       setWithdrawn(true);
+      setShowConfetti(true);
       toast({ title: "Withdrawal initiated", description: `$${totalWeek}.00 will arrive in 1–2 business days.` });
       setTimeout(() => {
         setSubScreen("main");
         setWithdrawn(false);
-      }, 2000);
+        setShowConfetti(false);
+      }, 2500);
     }, 1500);
   };
 
@@ -68,8 +203,15 @@ export default function EarningsDashboard() {
 
         {withdrawn ? (
           <motion.div className="text-center py-20" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-            <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
-              <Check className="w-8 h-8 text-accent" />
+            <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4 relative">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 400, damping: 12, delay: 0.1 }}
+              >
+                <Check className="w-8 h-8 text-accent" />
+              </motion.div>
+              {showConfetti && <ConfettiBurst />}
             </div>
             <h2 className="font-display font-bold text-xl text-foreground mb-1">Withdrawal Sent!</h2>
             <p className="text-sm text-muted-foreground">$237.00 is on its way to your bank account.</p>
@@ -107,7 +249,20 @@ export default function EarningsDashboard() {
               onClick={handleWithdraw}
               disabled={withdrawing}
             >
-              {withdrawing ? "Processing..." : `Withdraw $${totalWeek}.00`}
+              {withdrawing ? (
+                <motion.span
+                  className="flex items-center gap-2"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
+                  <motion.div
+                    className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
+                    animate={{ rotate: 360 }}
+                    transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }}
+                  />
+                  Processing...
+                </motion.span>
+              ) : `Withdraw $${totalWeek}.00`}
             </Button>
           </motion.div>
         )}
@@ -132,10 +287,11 @@ export default function EarningsDashboard() {
           {UPCOMING.map((booking, i) => (
             <motion.div
               key={booking.id}
-              className="soft-card p-3.5 flex items-center gap-3"
+              className="soft-card p-3.5 flex items-center gap-3 active:scale-[0.98] transition-transform"
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
+              whileHover={{ y: -2, boxShadow: "0 4px 16px rgba(0,0,0,0.08)" }}
             >
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0">
                 {booking.avatar}
@@ -186,20 +342,28 @@ export default function EarningsDashboard() {
         <p className="text-muted-foreground text-sm mb-6">Your parking income overview</p>
       </motion.div>
 
-      {/* Revenue card */}
+      {/* Revenue card — gradient */}
       <motion.div
-        className="soft-card p-5 mb-4 soft-shadow"
+        className="rounded-2xl p-5 mb-4 relative overflow-hidden"
+        style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(217 91% 48%), hsl(var(--accent)))" }}
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
       >
-        <div className="flex items-center justify-between mb-2">
-          {/* Period toggle */}
-          <div className="flex bg-secondary rounded-full p-0.5">
+        {/* Subtle shimmer */}
+        <motion.div
+          className="absolute inset-0 opacity-[0.07]"
+          style={{ background: "linear-gradient(105deg, transparent 40%, white 50%, transparent 60%)", backgroundSize: "200% 100%" }}
+          animate={{ backgroundPosition: ["200% 0", "-200% 0"] }}
+          transition={{ duration: 3, repeat: Infinity, repeatDelay: 4, ease: "linear" }}
+        />
+
+        <div className="flex items-center justify-between mb-2 relative z-10">
+          <div className="flex bg-white/15 backdrop-blur-sm rounded-full p-0.5">
             <button
               onClick={() => setPeriod("week")}
               className={`px-3 py-1 text-xs font-semibold rounded-full transition-all ${
-                period === "week" ? "bg-card text-foreground soft-shadow" : "text-muted-foreground"
+                period === "week" ? "bg-white/25 text-white" : "text-white/70"
               }`}
             >
               Week
@@ -207,54 +371,94 @@ export default function EarningsDashboard() {
             <button
               onClick={() => setPeriod("month")}
               className={`px-3 py-1 text-xs font-semibold rounded-full transition-all ${
-                period === "month" ? "bg-card text-foreground soft-shadow" : "text-muted-foreground"
+                period === "month" ? "bg-white/25 text-white" : "text-white/70"
               }`}
             >
               Month
             </button>
           </div>
-          <div className="flex items-center gap-1 text-accent text-sm font-semibold bg-accent/10 px-2.5 py-1 rounded-full">
+          <motion.div
+            className="flex items-center gap-1 text-white text-sm font-semibold bg-white/15 backdrop-blur-sm px-2.5 py-1 rounded-full"
+            initial={{ scale: 1 }}
+            animate={{ scale: [1, 1.08, 1] }}
+            transition={{ duration: 1.5, delay: 0.8, ease: "easeInOut" }}
+          >
             <ArrowUpRight className="w-3.5 h-3.5" />
             +18%
-          </div>
+          </motion.div>
         </div>
 
-        <p className="font-display font-extrabold text-3xl text-foreground mb-4">${displayTotal}</p>
+        <p className="font-display font-extrabold text-4xl text-white mb-1 relative z-10 tabular-nums">
+          ${animatedTotal.toLocaleString()}
+        </p>
+        <p className="text-white/60 text-xs relative z-10">
+          {period === "week" ? "This week" : "This month"} revenue
+        </p>
 
-        {/* Chart */}
-        <div className="flex items-end gap-[6px] h-24">
+        {/* Chart inside gradient card */}
+        <div className="flex items-end gap-[6px] h-20 mt-4 relative z-10">
           {earnings.map((day, i) => {
-            const barHeight = Math.round((day.amount / maxAmount) * 80);
+            const barHeight = Math.round((day.amount / maxAmount) * 64);
+            const isMax = day.amount === maxAmount;
             return (
-              <div key={`${period}-${day.day}`} className="flex-1 flex flex-col items-center gap-1.5">
-                <div className="flex-1 w-full flex items-end">
-                  <motion.div
-                    className="w-full rounded-lg bg-primary"
-                    initial={{ height: 0 }}
-                    animate={{ height: barHeight }}
-                    transition={{ delay: 0.1 + i * 0.04, type: "spring", stiffness: 300, damping: 25 }}
-                  />
-                </div>
-                <span className="text-[9px] text-muted-foreground font-medium">{day.day}</span>
-              </div>
+              <ChartBar key={`${period}-${day.day}`} day={day.day} amount={day.amount} maxAmount={maxAmount} index={i} period={period} />
             );
           })}
         </div>
       </motion.div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 gap-3 mb-6">
-        <motion.div className="soft-card p-4" initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
+      {/* Stats row */}
+      <div className="grid grid-cols-2 gap-3 mb-4">
+        <motion.div
+          className="soft-card p-4 cursor-pointer"
+          initial={{ opacity: 0, x: -8 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+          whileTap={{ scale: 0.97 }}
+        >
           <DollarSign className="w-5 h-5 text-accent mb-2" />
-          <p className="font-display font-extrabold text-xl text-foreground">$1,842</p>
+          <p className="font-display font-extrabold text-xl text-foreground tabular-nums">${animatedMonth.toLocaleString()}</p>
           <p className="text-xs text-muted-foreground">This month</p>
         </motion.div>
-        <motion.div className="soft-card p-4" initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.25 }}>
+        <motion.div
+          className="soft-card p-4 cursor-pointer"
+          initial={{ opacity: 0, x: 8 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.25 }}
+          whileTap={{ scale: 0.97 }}
+        >
           <Calendar className="w-5 h-5 text-primary mb-2" />
-          <p className="font-display font-extrabold text-xl text-foreground">23</p>
+          <p className="font-display font-extrabold text-xl text-foreground tabular-nums">{animatedBookings}</p>
           <p className="text-xs text-muted-foreground">Bookings</p>
         </motion.div>
       </div>
+
+      {/* Monthly goal progress */}
+      <motion.div
+        className="soft-card p-4 mb-6 flex items-center gap-4"
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        whileTap={{ scale: 0.98 }}
+      >
+        <ProgressRing percent={78} />
+        <div className="flex-1">
+          <div className="flex items-center gap-1.5 mb-0.5">
+            <Sparkles className="w-3.5 h-3.5 text-warning" />
+            <p className="font-display font-bold text-sm text-foreground">Monthly Goal</p>
+          </div>
+          <p className="text-xs text-muted-foreground mb-1">$1,842 of $2,400 target</p>
+          <div className="w-full h-1.5 bg-secondary rounded-full overflow-hidden">
+            <motion.div
+              className="h-full rounded-full"
+              style={{ background: "linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)))" }}
+              initial={{ width: 0 }}
+              animate={{ width: "78%" }}
+              transition={{ delay: 0.6, duration: 1, ease: "easeOut" }}
+            />
+          </div>
+        </div>
+      </motion.div>
 
       {/* Upcoming */}
       <div className="flex items-center justify-between mb-3">
@@ -268,7 +472,9 @@ export default function EarningsDashboard() {
             className="soft-card p-3.5 flex items-center gap-3"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 + i * 0.05 }}
+            transition={{ delay: 0.35 + i * 0.05 }}
+            whileHover={{ y: -2, boxShadow: "0 4px 16px rgba(0,0,0,0.08)" }}
+            whileTap={{ scale: 0.98 }}
           >
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0">
               {booking.avatar}
