@@ -25,10 +25,11 @@ const HOST_REPLIES = [
 ];
 
 export default function ChatSheet({ spot, onClose }: ChatSheetProps) {
+  const hostName = spot?.host?.name ?? "Host";
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "1",
-      text: `Hi! I'm the host for ${spot?.address}. How can I help you?`,
+      text: `Hi! I'm ${hostName}, the host for ${spot?.address}. How can I help you?`,
       sender: "host",
       time: "Just now",
     },
