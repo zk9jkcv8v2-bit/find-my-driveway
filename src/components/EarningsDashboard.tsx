@@ -149,7 +149,9 @@ function ChartBar({ day, amount, maxAmount, index, period }: { day: string; amou
         <motion.div
           className="w-full rounded-lg relative overflow-hidden"
           style={{
-            background: "linear-gradient(to top, hsl(var(--primary)), hsl(var(--accent)))",
+            background: isMax
+              ? "linear-gradient(to top, hsl(var(--accent)), hsl(152 60% 58%))"
+              : "hsl(var(--accent))",
             boxShadow: isMax ? "0 0 12px hsl(var(--accent) / 0.4)" : "none",
           }}
           initial={{ height: 0 }}
@@ -342,28 +344,19 @@ export default function EarningsDashboard() {
         <p className="text-muted-foreground text-sm mb-6">Your parking income overview</p>
       </motion.div>
 
-      {/* Revenue card — gradient */}
+      {/* Revenue card */}
       <motion.div
-        className="rounded-2xl p-5 mb-4 relative overflow-hidden"
-        style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(217 91% 48%), hsl(var(--accent)))" }}
+        className="soft-card p-5 mb-4 soft-shadow"
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
       >
-        {/* Subtle shimmer */}
-        <motion.div
-          className="absolute inset-0 opacity-[0.07]"
-          style={{ background: "linear-gradient(105deg, transparent 40%, white 50%, transparent 60%)", backgroundSize: "200% 100%" }}
-          animate={{ backgroundPosition: ["200% 0", "-200% 0"] }}
-          transition={{ duration: 3, repeat: Infinity, repeatDelay: 4, ease: "linear" }}
-        />
-
-        <div className="flex items-center justify-between mb-2 relative z-10">
-          <div className="flex bg-white/15 backdrop-blur-sm rounded-full p-0.5">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex bg-secondary rounded-full p-0.5">
             <button
               onClick={() => setPeriod("week")}
               className={`px-3 py-1 text-xs font-semibold rounded-full transition-all ${
-                period === "week" ? "bg-white/25 text-white" : "text-white/70"
+                period === "week" ? "bg-card text-foreground soft-shadow" : "text-muted-foreground"
               }`}
             >
               Week
@@ -371,14 +364,14 @@ export default function EarningsDashboard() {
             <button
               onClick={() => setPeriod("month")}
               className={`px-3 py-1 text-xs font-semibold rounded-full transition-all ${
-                period === "month" ? "bg-white/25 text-white" : "text-white/70"
+                period === "month" ? "bg-card text-foreground soft-shadow" : "text-muted-foreground"
               }`}
             >
               Month
             </button>
           </div>
           <motion.div
-            className="flex items-center gap-1 text-white text-sm font-semibold bg-white/15 backdrop-blur-sm px-2.5 py-1 rounded-full"
+            className="flex items-center gap-1 text-accent text-sm font-semibold bg-accent/10 px-2.5 py-1 rounded-full"
             initial={{ scale: 1 }}
             animate={{ scale: [1, 1.08, 1] }}
             transition={{ duration: 1.5, delay: 0.8, ease: "easeInOut" }}
@@ -388,15 +381,15 @@ export default function EarningsDashboard() {
           </motion.div>
         </div>
 
-        <p className="font-display font-extrabold text-4xl text-white mb-1 relative z-10 tabular-nums">
+        <p className="font-display font-extrabold text-4xl text-foreground mb-1 tabular-nums">
           ${animatedTotal.toLocaleString()}
         </p>
-        <p className="text-white/60 text-xs relative z-10">
+        <p className="text-muted-foreground text-xs">
           {period === "week" ? "This week" : "This month"} revenue
         </p>
 
         {/* Chart inside gradient card */}
-        <div className="flex items-end gap-[6px] h-20 mt-4 relative z-10">
+        <div className="flex items-end gap-[6px] h-20 mt-4">
           {earnings.map((day, i) => {
             const barHeight = Math.round((day.amount / maxAmount) * 64);
             const isMax = day.amount === maxAmount;
