@@ -149,7 +149,9 @@ function ChartBar({ day, amount, maxAmount, index, period }: { day: string; amou
         <motion.div
           className="w-full rounded-lg relative overflow-hidden"
           style={{
-            background: "linear-gradient(to top, hsl(var(--primary)), hsl(var(--accent)))",
+            background: isMax
+              ? "linear-gradient(to top, hsl(var(--accent)), hsl(152 60% 58%))"
+              : "hsl(var(--accent))",
             boxShadow: isMax ? "0 0 12px hsl(var(--accent) / 0.4)" : "none",
           }}
           initial={{ height: 0 }}
