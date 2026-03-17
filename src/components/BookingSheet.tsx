@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Clock, Calendar, Zap, Check, Shield } from "lucide-react";
+import { X, Clock, Calendar, Zap, Check, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { SpotMarker } from "./MapView";
 import { useState } from "react";
@@ -7,6 +7,7 @@ import { useState } from "react";
 interface BookingSheetProps {
   spot: SpotMarker | null;
   onClose: () => void;
+  onNavigate?: (spot: SpotMarker) => void;
 }
 
 const TIME_OPTIONS = [
@@ -15,7 +16,7 @@ const TIME_OPTIONS = [
   { label: "Schedule", icon: Calendar, sub: "Book ahead" },
 ];
 
-export default function BookingSheet({ spot, onClose }: BookingSheetProps) {
+export default function BookingSheet({ spot, onClose, onNavigate }: BookingSheetProps) {
   const [selectedTime, setSelectedTime] = useState(0);
   const [duration, setDuration] = useState(2);
   const [confirmed, setConfirmed] = useState(false);
@@ -26,6 +27,13 @@ export default function BookingSheet({ spot, onClose }: BookingSheetProps) {
   const serviceFee = Math.round(total * 0.1 * 100) / 100;
   const grandTotal = total + serviceFee;
 
+  const handleGetDirections = () => {
+    if (onNavigate) {
+      onNavigate(spot);
+    }
+    onClose();
+  };
+
   return (
     <AnimatePresence>
       <motion.div
@@ -34,7 +42,6 @@ export default function BookingSheet({ spot, onClose }: BookingSheetProps) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
-        {/* Backdrop */}
         <motion.div
           className="absolute inset-0 bg-foreground/20 backdrop-blur-[2px]"
           onClick={onClose}
@@ -42,7 +49,6 @@ export default function BookingSheet({ spot, onClose }: BookingSheetProps) {
           animate={{ opacity: 1 }}
         />
 
-        {/* Sheet */}
         <motion.div
           className="relative w-full max-w-lg bg-card rounded-t-3xl p-5 pb-8 soft-shadow-xl"
           initial={{ y: "100%" }}
@@ -50,7 +56,6 @@ export default function BookingSheet({ spot, onClose }: BookingSheetProps) {
           exit={{ y: "100%" }}
           transition={{ type: "spring", damping: 28, stiffness: 350 }}
         >
-          {/* Handle */}
           <div className="flex justify-center mb-3">
             <div className="w-10 h-1 rounded-full bg-border" />
           </div>
@@ -61,13 +66,11 @@ export default function BookingSheet({ spot, onClose }: BookingSheetProps) {
 
           {!confirmed ? (
             <>
-              {/* Header */}
               <div className="mb-5">
                 <h2 className="font-display font-bold text-lg text-foreground">Book Parking</h2>
                 <p className="text-sm text-muted-foreground">{spot.address}</p>
               </div>
 
-              {/* Time selection */}
               <div className="grid grid-cols-3 gap-2 mb-5">
                 {TIME_OPTIONS.map((opt, i) => {
                   const Icon = opt.icon;
@@ -88,7 +91,6 @@ export default function BookingSheet({ spot, onClose }: BookingSheetProps) {
                 })}
               </div>
 
-              {/* Duration */}
               <div className="flex items-center justify-between bg-secondary rounded-2xl p-4 mb-5">
                 <span className="text-sm font-medium text-foreground">Duration</span>
                 <div className="flex items-center gap-4">
@@ -104,7 +106,6 @@ export default function BookingSheet({ spot, onClose }: BookingSheetProps) {
                 </div>
               </div>
 
-              {/* Price breakdown */}
               <div className="space-y-2 mb-5">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">${spot.price} × {duration} hours</span>
@@ -121,12 +122,7 @@ export default function BookingSheet({ spot, onClose }: BookingSheetProps) {
                 </div>
               </div>
 
-              <Button
-                variant="cta"
-                size="xl"
-                className="w-full rounded-2xl"
-                onClick={() => setConfirmed(true)}
-              >
+              <Button variant="cta" size="xl" className="w-full rounded-2xl" onClick={() => setConfirmed(true)}>
                 Confirm Booking · ${grandTotal.toFixed(2)}
               </Button>
             </>
@@ -141,7 +137,8 @@ export default function BookingSheet({ spot, onClose }: BookingSheetProps) {
               </div>
               <h2 className="font-display font-bold text-xl text-foreground mb-1">You're all set!</h2>
               <p className="text-muted-foreground text-sm mb-6">{spot.address} · {duration}h · ${grandTotal.toFixed(2)}</p>
-              <Button variant="cta" size="lg" className="w-full rounded-2xl" onClick={onClose}>
+              <Button variant="cta" size="lg" className="w-full rounded-2xl gap-2" onClick={handleGetDirections}>
+                <Navigation className="w-4 h-4" />
                 Get Directions
               </Button>
             </motion.div>

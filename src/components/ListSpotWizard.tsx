@@ -1,13 +1,41 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Camera, MapPin, DollarSign, Clock, ChevronRight, Check, Upload, Image } from "lucide-react";
+import { Camera, MapPin, DollarSign, Clock, ChevronRight, Check, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
 const STEPS = ["Photo", "Location", "Price", "Hours"];
+
+const SF_CENTER: [number, number] = [37.7749, -122.4194];
+
+function createPinIcon() {
+  return L.divIcon({
+    className: "parkr-marker",
+    html: `<div style="
+      width:32px;height:32px;border-radius:50% 50% 50% 0;
+      background:hsl(217,91%,60%);transform:rotate(-45deg);
+      border:3px solid #fff;box-shadow:0 2px 12px rgba(59,130,246,0.4);
+    "></div>`,
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+  });
+}
+
+function DraggablePin({ position, onMove }: { position: [number, number]; onMove: (pos: [number, number]) => void }) {
+  useMapEvents({
+    click(e) {
+      onMove([e.latlng.lat, e.latlng.lng]);
+    },
+  });
+  return <Marker position={position} icon={createPinIcon()} />;
+}
 
 export default function ListSpotWizard() {
   const [step, setStep] = useState(0);
   const [completed, setCompleted] = useState(false);
+  const [pinPos, setPinPos] = useState<[number, number]>(SF_CENTER);
 
   const nextStep = () => {
     if (step < STEPS.length - 1) setStep(step + 1);
@@ -25,9 +53,7 @@ export default function ListSpotWizard() {
       <div className="flex gap-2 mb-8">
         {STEPS.map((s, i) => (
           <div key={s} className="flex-1">
-            <div className={`h-1.5 rounded-full transition-all duration-500 ${
-              i <= step ? "bg-primary" : "bg-border"
-            }`} />
+            <div className={`h-1.5 rounded-full transition-all duration-500 ${i <= step ? "bg-primary" : "bg-border"}`} />
             <p className={`text-[10px] mt-1.5 font-medium ${i <= step ? "text-primary" : "text-muted-foreground"}`}>{s}</p>
           </div>
         ))}
@@ -35,12 +61,7 @@ export default function ListSpotWizard() {
 
       <AnimatePresence mode="wait">
         {completed ? (
-          <motion.div
-            key="done"
-            className="text-center py-16"
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-          >
+          <motion.div key="done" className="text-center py-16" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
             <div className="w-20 h-20 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-5">
               <Check className="w-10 h-10 text-accent" />
             </div>
@@ -48,13 +69,7 @@ export default function ListSpotWizard() {
             <p className="text-muted-foreground text-sm max-w-[240px] mx-auto">Your parking spot is now visible to drivers nearby.</p>
           </motion.div>
         ) : (
-          <motion.div
-            key={step}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.2 }}
-          >
+          <motion.div key={step} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
             {step === 0 && (
               <div className="soft-card p-6">
                 <div className="flex items-center gap-2 mb-4">
@@ -78,23 +93,16 @@ export default function ListSpotWizard() {
                   <MapPin className="w-5 h-5 text-primary" />
                   <h3 className="font-display font-bold text-foreground">Spot Location</h3>
                 </div>
-                {/* Mini map */}
-                <div className="w-full h-44 rounded-2xl bg-[#f0ede6] mb-4 relative overflow-hidden">
-                  <svg className="absolute inset-0 w-full h-full" viewBox="0 0 300 200">
-                    <rect x="0" y="80" width="300" height="6" fill="#fff" />
-                    <rect x="0" y="140" width="300" height="6" fill="#fff" />
-                    <rect x="80" y="0" width="6" height="200" fill="#fff" />
-                    <rect x="180" y="0" width="6" height="200" fill="#fff" />
-                    <rect x="90" y="90" width="85" height="45" fill="#e8e5de" rx="3" />
-                    <rect x="90" y="10" width="85" height="65" fill="#d4e8d0" rx="5" />
-                  </svg>
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                    <div className="w-4 h-4 rounded-full bg-primary border-[3px] border-card soft-shadow" />
-                  </div>
+                <div className="w-full h-44 rounded-2xl overflow-hidden mb-4">
+                  <MapContainer center={SF_CENTER} zoom={14} className="w-full h-full" zoomControl={false} attributionControl={false}>
+                    <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" />
+                    <DraggablePin position={pinPos} onMove={setPinPos} />
+                  </MapContainer>
                 </div>
-                <div className="flex items-center gap-2 p-3 rounded-xl bg-secondary">
+                <p className="text-xs text-muted-foreground text-center">Tap on the map to set your spot's location</p>
+                <div className="flex items-center gap-2 p-3 rounded-xl bg-secondary mt-3">
                   <MapPin className="w-4 h-4 text-primary shrink-0" />
-                  <p className="text-sm text-foreground">742 Valencia St, San Francisco, CA</p>
+                  <p className="text-sm text-foreground">{pinPos[0].toFixed(4)}, {pinPos[1].toFixed(4)}</p>
                 </div>
               </div>
             )}
@@ -144,12 +152,7 @@ export default function ListSpotWizard() {
 
       {!completed && (
         <motion.div className="mt-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
-          <Button
-            variant="cta"
-            size="xl"
-            className="w-full rounded-2xl font-display"
-            onClick={nextStep}
-          >
+          <Button variant="cta" size="xl" className="w-full rounded-2xl font-display" onClick={nextStep}>
             {step === STEPS.length - 1 ? "Publish Spot" : "Continue"}
             <ChevronRight className="w-5 h-5 ml-1" />
           </Button>
