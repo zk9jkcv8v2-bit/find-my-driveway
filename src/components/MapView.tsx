@@ -6,6 +6,15 @@ import spotDriveway from "@/assets/spot-driveway.jpg";
 import spotGarage from "@/assets/spot-garage.jpg";
 import spotLot from "@/assets/spot-lot.jpg";
 
+export interface HostProfile {
+  name: string;
+  avatar: string;
+  responseTime: string;
+  verified: boolean;
+  memberSince: string;
+  totalSpots: number;
+}
+
 export interface SpotMarker {
   id: string;
   price: number;
@@ -19,6 +28,7 @@ export interface SpotMarker {
   lat: number;
   lng: number;
   image?: string;
+  host: HostProfile;
 }
 
 const spotImages = { driveway: spotDriveway, garage: spotGarage, lot: spotLot };
