@@ -35,6 +35,26 @@ export default function ProfileView() {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [savedSpots, setSavedSpots] = useState(SAVED_SPOTS);
   const [vehicles, setVehicles] = useState(VEHICLES);
+  const [theme, setTheme] = useState<ThemeMode>(() => {
+    const saved = localStorage.getItem("parkr-theme") as ThemeMode | null;
+    return saved || "light";
+  });
+  const [language, setLanguage] = useState("English");
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === "dark") {
+      root.classList.add("dark");
+    } else if (theme === "light") {
+      root.classList.remove("dark");
+    } else {
+      // system
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      if (prefersDark) root.classList.add("dark");
+      else root.classList.remove("dark");
+    }
+    localStorage.setItem("parkr-theme", theme);
+  }, [theme]);
 
   const BackButton = () => (
     <button onClick={() => setSubScreen("main")} className="flex items-center gap-1 text-sm text-muted-foreground mb-6 hover:text-foreground transition-colors">
