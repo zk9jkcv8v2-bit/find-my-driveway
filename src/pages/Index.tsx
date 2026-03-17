@@ -117,7 +117,7 @@ export default function Index() {
 
             {selectedSpot && sheetExpanded ? (
               <div className="px-4 pb-24 overflow-y-auto max-h-[60vh]">
-                <SpotCard spot={selectedSpot} onBook={setBookingSpot} onNavigate={handleNavigate} />
+                <SpotCard spot={selectedSpot} onBook={setBookingSpot} onNavigate={handleNavigate} onChat={setChatSpot} />
               </div>
             ) : (
               <div className="pb-24">
