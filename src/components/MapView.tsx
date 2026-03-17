@@ -139,7 +139,7 @@ interface MapViewProps {
 }
 
 export default function MapView({ onSpotSelect, selectedSpot }: MapViewProps) {
-  const [userPos, setUserPos] = useState<[number, number]>(SF_CENTER);
+  const [userPos, setUserPos] = useState<[number, number]>(OREBRO_CENTER);
 
   return (
     <div className="relative w-full h-full">
