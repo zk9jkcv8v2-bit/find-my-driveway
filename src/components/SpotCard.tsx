@@ -71,6 +71,13 @@ export default function SpotCard({ spot, onBook, onNavigate, onChat, compact = f
 
           <p className="text-xs text-muted-foreground mb-2">{spot.distance} · {typeLabel}</p>
 
+          {/* Host info */}
+          <div className="flex items-center gap-2 mb-2">
+            <img src={spot.host.avatar} alt={spot.host.name} className="w-5 h-5 rounded-full object-cover" />
+            <span className="text-[11px] font-medium text-foreground">{spot.host.name}</span>
+            {spot.host.verified && <BadgeCheck className="w-3.5 h-3.5 text-primary" />}
+          </div>
+
           {/* Tags */}
           <div className="flex gap-1.5 mb-3 flex-wrap">
             {spot.hasEV && (

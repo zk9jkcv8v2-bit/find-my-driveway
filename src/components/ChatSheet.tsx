@@ -93,14 +93,11 @@ export default function ChatSheet({ spot, onClose }: ChatSheetProps) {
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-border">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
-                <span className="text-sm font-bold text-primary">H</span>
-              </div>
+              <img src={spot.host.avatar} alt={spot.host.name} className="w-9 h-9 rounded-full object-cover" />
               <div>
-                <p className="text-sm font-semibold text-foreground">Spot Host</p>
-                <p className="text-[10px] text-accent font-medium flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" />
-                  Online
+                <p className="text-sm font-semibold text-foreground">{spot.host.name}</p>
+                <p className="text-[10px] text-muted-foreground">
+                  Responds {spot.host.responseTime} · Member since {spot.host.memberSince}
                 </p>
               </div>
             </div>
