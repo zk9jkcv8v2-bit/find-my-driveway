@@ -166,7 +166,7 @@ export default function MapView({ onSpotSelect, selectedSpot, spots }: MapViewPr
         <FlyToSpot spot={selectedSpot} />
         <LocateUser onLocate={setUserPos} />
         <Marker position={userPos} icon={createUserIcon()} />
-        {MOCK_SPOTS.filter((s) => s.available).map((spot) => (
+        {(spots || MOCK_SPOTS.filter((s) => s.available)).map((spot) => (
           <Marker
             key={spot.id}
             position={[spot.lat, spot.lng]}

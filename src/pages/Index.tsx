@@ -141,9 +141,9 @@ export default function Index() {
         </div>
       )}
 
-      {activeTab === "list" && <ListSpotWizard />}
+      {activeTab === "list" && <div className="h-full overflow-y-auto"><ListSpotWizard /></div>}
       {activeTab === "earnings" && <EarningsDashboard />}
-      {activeTab === "profile" && <ProfileView />}
+      {activeTab === "profile" && <div className="h-full overflow-y-auto"><ProfileView /></div>}
 
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
 

@@ -338,7 +338,7 @@ export default function EarningsDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24 px-4 pt-14">
+    <div className="h-screen bg-background pb-24 px-4 pt-14 overflow-y-auto">
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="font-display font-extrabold text-2xl text-foreground mb-0.5">Earnings</h1>
         <p className="text-muted-foreground text-sm mb-6">Your parking income overview</p>
