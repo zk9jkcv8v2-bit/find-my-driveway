@@ -139,7 +139,7 @@ interface MapViewProps {
   spots?: SpotMarker[];
 }
 
-export default function MapView({ onSpotSelect, selectedSpot }: MapViewProps) {
+export default function MapView({ onSpotSelect, selectedSpot, spots }: MapViewProps) {
   const [userPos, setUserPos] = useState<[number, number]>(OREBRO_CENTER);
 
   return (
