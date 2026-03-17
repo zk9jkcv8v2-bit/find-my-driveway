@@ -198,7 +198,7 @@ export default function EarningsDashboard() {
 
   if (subScreen === "withdraw") {
     return (
-      <div className="min-h-screen bg-background pb-24 px-4 pt-14">
+      <div className="h-screen bg-background pb-24 px-4 pt-14 overflow-y-auto">
         <button onClick={() => setSubScreen("main")} className="flex items-center gap-1 text-sm text-muted-foreground mb-6 hover:text-foreground transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back
         </button>
@@ -274,7 +274,7 @@ export default function EarningsDashboard() {
 
   if (subScreen === "all-bookings") {
     return (
-      <div className="min-h-screen bg-background pb-24 px-4 pt-14">
+      <div className="h-screen bg-background pb-24 px-4 pt-14 overflow-y-auto">
         <button onClick={() => setSubScreen("main")} className="flex items-center gap-1 text-sm text-muted-foreground mb-6 hover:text-foreground transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back
         </button>
@@ -338,7 +338,7 @@ export default function EarningsDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24 px-4 pt-14">
+    <div className="h-screen bg-background pb-24 px-4 pt-14 overflow-y-auto">
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="font-display font-extrabold text-2xl text-foreground mb-0.5">Earnings</h1>
         <p className="text-muted-foreground text-sm mb-6">Your parking income overview</p>
