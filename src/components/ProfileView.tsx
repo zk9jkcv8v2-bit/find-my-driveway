@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Star, Shield, Car, MapPin, ChevronRight, Bell, HelpCircle, LogOut, ArrowLeft, Check, Plus, Trash2, Settings, Moon, Globe } from "lucide-react";
+import { Star, Shield, Car, MapPin, ChevronRight, Bell, HelpCircle, LogOut, ArrowLeft, Check, Plus, Trash2, Settings, Moon, Sun, Globe, Palette } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 
-type SubScreen = "main" | "verification" | "vehicles" | "saved" | "notifications" | "help";
+type SubScreen = "main" | "verification" | "vehicles" | "saved" | "notifications" | "help" | "settings";
+type ThemeMode = "light" | "dark" | "system";
 
 const SAVED_SPOTS = [
   { id: "1", address: "742 Valencia St", type: "Driveway", price: 5 },
@@ -34,6 +35,26 @@ export default function ProfileView() {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [savedSpots, setSavedSpots] = useState(SAVED_SPOTS);
   const [vehicles, setVehicles] = useState(VEHICLES);
+  const [theme, setTheme] = useState<ThemeMode>(() => {
+    const saved = localStorage.getItem("parkr-theme") as ThemeMode | null;
+    return saved || "light";
+  });
+  const [language, setLanguage] = useState("English");
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === "dark") {
+      root.classList.add("dark");
+    } else if (theme === "light") {
+      root.classList.remove("dark");
+    } else {
+      // system
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      if (prefersDark) root.classList.add("dark");
+      else root.classList.remove("dark");
+    }
+    localStorage.setItem("parkr-theme", theme);
+  }, [theme]);
 
   const BackButton = () => (
     <button onClick={() => setSubScreen("main")} className="flex items-center gap-1 text-sm text-muted-foreground mb-6 hover:text-foreground transition-colors">
@@ -279,8 +300,108 @@ export default function ProfileView() {
     );
   }
 
+  if (subScreen === "settings") {
+    const THEME_OPTIONS: { value: ThemeMode; label: string; icon: typeof Sun }[] = [
+      { value: "light", label: "Light", icon: Sun },
+      { value: "dark", label: "Dark", icon: Moon },
+      { value: "system", label: "System", icon: Palette },
+    ];
+
+    const LANGUAGES = ["English", "Svenska", "Deutsch", "Español"];
+
+    return (
+      <div className="min-h-screen bg-background pb-24 px-4 pt-14">
+        <BackButton />
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+          <h1 className="font-display font-extrabold text-2xl text-foreground mb-1">Settings</h1>
+          <p className="text-muted-foreground text-sm mb-6">Customize your app experience</p>
+        </motion.div>
+
+        {/* Appearance */}
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Appearance</p>
+          <div className="soft-card p-2 mb-5">
+            <div className="grid grid-cols-3 gap-1">
+              {THEME_OPTIONS.map((opt) => {
+                const Icon = opt.icon;
+                const active = theme === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    onClick={() => {
+                      setTheme(opt.value);
+                      toast({ title: `Theme: ${opt.label}`, description: `Switched to ${opt.label.toLowerCase()} mode.` });
+                    }}
+                    className={`flex flex-col items-center gap-1.5 py-3 rounded-xl transition-all ${
+                      active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-secondary"
+                    }`}
+                  >
+                    <Icon className="w-5 h-5" />
+                    <span className="text-xs font-semibold">{opt.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Language */}
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Language</p>
+          <div className="soft-card overflow-hidden mb-5">
+            {LANGUAGES.map((lang, i) => (
+              <button
+                key={lang}
+                onClick={() => {
+                  setLanguage(lang);
+                  toast({ title: "Language updated", description: `App language set to ${lang}.` });
+                }}
+                className={`w-full flex items-center justify-between px-4 py-3.5 transition-colors ${
+                  i < LANGUAGES.length - 1 ? "border-b border-border" : ""
+                } ${language === lang ? "bg-primary/5" : "hover:bg-secondary/50"}`}
+              >
+                <div className="flex items-center gap-3">
+                  <Globe className={`w-4 h-4 ${language === lang ? "text-primary" : "text-muted-foreground"}`} />
+                  <span className={`text-sm font-medium ${language === lang ? "text-primary" : "text-foreground"}`}>{lang}</span>
+                </div>
+                {language === lang && <Check className="w-4 h-4 text-primary" />}
+              </button>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* About */}
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">About</p>
+          <div className="soft-card overflow-hidden">
+            {[
+              { label: "Version", value: "1.0.0" },
+              { label: "Terms of Service", value: "" },
+              { label: "Privacy Policy", value: "" },
+            ].map((item, i) => (
+              <button
+                key={item.label}
+                className={`w-full flex items-center justify-between px-4 py-3.5 hover:bg-secondary/50 transition-colors ${
+                  i < 2 ? "border-b border-border" : ""
+                }`}
+              >
+                <span className="text-sm font-medium text-foreground">{item.label}</span>
+                {item.value ? (
+                  <span className="text-xs text-muted-foreground">{item.value}</span>
+                ) : (
+                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                )}
+              </button>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
   // Main profile
   const MENU_ITEMS = [
+    { label: "Settings", icon: Settings, desc: "Theme, language, preferences", color: "text-muted-foreground", screen: "settings" as SubScreen },
     { label: "Verification", icon: Shield, desc: "Identity verified", color: "text-accent", screen: "verification" as SubScreen },
     { label: "My Vehicles", icon: Car, desc: `${vehicles.length} vehicles added`, color: "text-primary", screen: "vehicles" as SubScreen },
     { label: "Saved Spots", icon: MapPin, desc: `${savedSpots.length} saved`, color: "text-primary", screen: "saved" as SubScreen },
@@ -303,7 +424,7 @@ export default function ProfileView() {
           <h1 className="font-display font-extrabold text-xl text-foreground">Jordan Doe</h1>
           <p className="text-sm text-muted-foreground">Member since 2024</p>
         </div>
-        <button className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+        <button onClick={() => setSubScreen("settings")} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
           <Settings className="w-4 h-4" />
         </button>
       </motion.div>
