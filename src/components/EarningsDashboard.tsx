@@ -389,7 +389,7 @@ export default function EarningsDashboard() {
         </p>
 
         {/* Chart inside gradient card */}
-        <div className="flex items-end gap-[6px] h-20 mt-4 relative z-10">
+        <div className="flex items-end gap-[6px] h-20 mt-4">
           {earnings.map((day, i) => {
             const barHeight = Math.round((day.amount / maxAmount) * 64);
             const isMax = day.amount === maxAmount;
