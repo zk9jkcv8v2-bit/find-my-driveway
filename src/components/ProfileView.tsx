@@ -302,6 +302,7 @@ export default function ProfileView() {
 
   // Main profile
   const MENU_ITEMS = [
+    { label: "Settings", icon: Settings, desc: "Theme, language, preferences", color: "text-muted-foreground", screen: "settings" as SubScreen },
     { label: "Verification", icon: Shield, desc: "Identity verified", color: "text-accent", screen: "verification" as SubScreen },
     { label: "My Vehicles", icon: Car, desc: `${vehicles.length} vehicles added`, color: "text-primary", screen: "vehicles" as SubScreen },
     { label: "Saved Spots", icon: MapPin, desc: `${savedSpots.length} saved`, color: "text-primary", screen: "saved" as SubScreen },
