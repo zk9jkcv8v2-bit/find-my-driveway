@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Star, Zap, Shield, MapPin, Navigation, MessageCircle } from "lucide-react";
+import { Star, Zap, Shield, MapPin, Navigation, MessageCircle, BadgeCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { SpotMarker } from "./MapView";
 
