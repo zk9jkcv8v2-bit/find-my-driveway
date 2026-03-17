@@ -4,6 +4,7 @@ import MapView, { MOCK_SPOTS, type SpotMarker } from "@/components/MapView";
 import FilterBar from "@/components/FilterBar";
 import SpotCard from "@/components/SpotCard";
 import BookingSheet from "@/components/BookingSheet";
+import ChatSheet from "@/components/ChatSheet";
 import BottomNav from "@/components/BottomNav";
 import EarningsDashboard from "@/components/EarningsDashboard";
 import ListSpotWizard from "@/components/ListSpotWizard";
@@ -15,6 +16,7 @@ export default function Index() {
   const [activeTab, setActiveTab] = useState("discover");
   const [selectedSpot, setSelectedSpot] = useState<SpotMarker | null>(null);
   const [bookingSpot, setBookingSpot] = useState<SpotMarker | null>(null);
+  const [chatSpot, setChatSpot] = useState<SpotMarker | null>(null);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [sheetExpanded, setSheetExpanded] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -115,7 +117,7 @@ export default function Index() {
 
             {selectedSpot && sheetExpanded ? (
               <div className="px-4 pb-24 overflow-y-auto max-h-[60vh]">
-                <SpotCard spot={selectedSpot} onBook={setBookingSpot} onNavigate={handleNavigate} />
+                <SpotCard spot={selectedSpot} onBook={setBookingSpot} onNavigate={handleNavigate} onChat={setChatSpot} />
               </div>
             ) : (
               <div className="pb-24">
@@ -150,6 +152,9 @@ export default function Index() {
       <AnimatePresence>
         {bookingSpot && (
           <BookingSheet spot={bookingSpot} onClose={() => setBookingSpot(null)} onNavigate={handleNavigate} />
+        )}
+        {chatSpot && (
+          <ChatSheet spot={chatSpot} onClose={() => setChatSpot(null)} />
         )}
       </AnimatePresence>
     </div>

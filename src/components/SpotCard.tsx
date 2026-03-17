@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Star, Zap, Shield, MapPin, Navigation } from "lucide-react";
+import { Star, Zap, Shield, MapPin, Navigation, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { SpotMarker } from "./MapView";
 
@@ -7,10 +7,11 @@ interface SpotCardProps {
   spot: SpotMarker;
   onBook: (spot: SpotMarker) => void;
   onNavigate: (spot: SpotMarker) => void;
+  onChat?: (spot: SpotMarker) => void;
   compact?: boolean;
 }
 
-export default function SpotCard({ spot, onBook, onNavigate, compact = false }: SpotCardProps) {
+export default function SpotCard({ spot, onBook, onNavigate, onChat, compact = false }: SpotCardProps) {
   const typeLabel = spot.type === "driveway" ? "Driveway" : spot.type === "garage" ? "Garage" : "Parking Lot";
   const typeEmoji = spot.type === "garage" ? "🏢" : spot.type === "driveway" ? "🏠" : "🅿️";
 
@@ -94,6 +95,16 @@ export default function SpotCard({ spot, onBook, onNavigate, compact = false }: 
               <span className="text-xs text-muted-foreground">/hr</span>
             </div>
             <div className="flex gap-2">
+              {onChat && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9 rounded-full"
+                  onClick={() => onChat(spot)}
+                >
+                  <MessageCircle className="w-4 h-4" />
+                </Button>
+              )}
               <Button
                 variant="ghost"
                 size="icon"
