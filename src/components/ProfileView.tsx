@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Star, Shield, Car, MapPin, ChevronRight, Bell, HelpCircle, LogOut, ArrowLeft, Check, Plus, Trash2, Settings, Moon, Globe } from "lucide-react";
+import { Star, Shield, Car, MapPin, ChevronRight, Bell, HelpCircle, LogOut, ArrowLeft, Check, Plus, Trash2, Settings, Moon, Sun, Globe, Palette } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 
-type SubScreen = "main" | "verification" | "vehicles" | "saved" | "notifications" | "help";
+type SubScreen = "main" | "verification" | "vehicles" | "saved" | "notifications" | "help" | "settings";
+type ThemeMode = "light" | "dark" | "system";
 
 const SAVED_SPOTS = [
   { id: "1", address: "742 Valencia St", type: "Driveway", price: 5 },
