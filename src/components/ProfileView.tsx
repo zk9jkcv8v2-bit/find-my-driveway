@@ -424,9 +424,6 @@ export default function ProfileView() {
           <h1 className="font-display font-extrabold text-xl text-foreground">Jordan Doe</h1>
           <p className="text-sm text-muted-foreground">Member since 2024</p>
         </div>
-        <button onClick={() => setSubScreen("settings")} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
-          <Settings className="w-4 h-4" />
-        </button>
       </motion.div>
 
       {/* Stats */}
