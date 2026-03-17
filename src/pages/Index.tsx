@@ -4,6 +4,7 @@ import MapView, { MOCK_SPOTS, type SpotMarker } from "@/components/MapView";
 import FilterBar from "@/components/FilterBar";
 import SpotCard from "@/components/SpotCard";
 import BookingSheet from "@/components/BookingSheet";
+import ChatSheet from "@/components/ChatSheet";
 import BottomNav from "@/components/BottomNav";
 import EarningsDashboard from "@/components/EarningsDashboard";
 import ListSpotWizard from "@/components/ListSpotWizard";
