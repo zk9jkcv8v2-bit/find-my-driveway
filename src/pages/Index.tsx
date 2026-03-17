@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { AnimatePresence } from "framer-motion";
-import MapView, { type SpotMarker } from "@/components/MapView";
+import { useState, useRef } from "react";
+import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from "framer-motion";
+import MapView, { MOCK_SPOTS, type SpotMarker } from "@/components/MapView";
 import FilterBar from "@/components/FilterBar";
 import SpotCard from "@/components/SpotCard";
 import BookingSheet from "@/components/BookingSheet";
@@ -9,49 +9,105 @@ import EarningsDashboard from "@/components/EarningsDashboard";
 import ListSpotWizard from "@/components/ListSpotWizard";
 import ProfileView from "@/components/ProfileView";
 import { toast } from "@/hooks/use-toast";
+import { Search, SlidersHorizontal } from "lucide-react";
 
 export default function Index() {
   const [activeTab, setActiveTab] = useState("discover");
   const [selectedSpot, setSelectedSpot] = useState<SpotMarker | null>(null);
   const [bookingSpot, setBookingSpot] = useState<SpotMarker | null>(null);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [sheetExpanded, setSheetExpanded] = useState(false);
 
   const handleNavigate = (spot: SpotMarker) => {
     toast({
-      title: "Opening navigation",
-      description: `Directions to ${spot.address}`,
+      title: "Opening Maps",
+      description: `Getting directions to ${spot.address}`,
     });
   };
+
+  const availableSpots = MOCK_SPOTS.filter(s => s.available);
 
   return (
     <div className="h-screen w-screen overflow-hidden bg-background">
       {activeTab === "discover" && (
-        <div className="h-full flex flex-col">
-          {/* Search header */}
-          <div className="relative z-20 pt-12 px-4 pb-2">
-            <h1 className="font-display font-bold text-lg text-foreground mb-0.5">Find Parking</h1>
-            <p className="text-xs text-muted-foreground">San Francisco, CA</p>
-          </div>
-
-          <FilterBar activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+        <div className="h-full flex flex-col relative">
+          {/* Search bar - floating on map */}
+          <motion.div
+            className="absolute top-12 left-4 right-4 z-20"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <div className="flex gap-2">
+              <div className="flex-1 flex items-center gap-3 bg-card rounded-full px-4 py-3 soft-shadow-lg">
+                <Search className="w-4 h-4 text-muted-foreground shrink-0" />
+                <span className="text-sm text-muted-foreground">Find parking nearby</span>
+              </div>
+              <button className="w-11 h-11 rounded-full bg-card soft-shadow-lg flex items-center justify-center shrink-0">
+                <SlidersHorizontal className="w-4 h-4 text-foreground" />
+              </button>
+            </div>
+          </motion.div>
 
           {/* Map */}
-          <div className="flex-1 relative">
-            <MapView onSpotSelect={setSelectedSpot} selectedSpot={selectedSpot} />
+          <div className="flex-1">
+            <MapView onSpotSelect={(spot) => {
+              setSelectedSpot(spot);
+              setSheetExpanded(true);
+            }} selectedSpot={selectedSpot} />
           </div>
 
-          {/* Selected spot card */}
-          <div className="pb-20">
-            <AnimatePresence>
-              {selectedSpot && selectedSpot.available && (
+          {/* Bottom sheet with spots */}
+          <motion.div
+            className="absolute bottom-0 left-0 right-0 z-30 bg-card rounded-t-3xl soft-shadow-xl"
+            initial={{ y: "60%" }}
+            animate={{ y: sheetExpanded && selectedSpot ? "10%" : "55%" }}
+            transition={{ type: "spring", damping: 28, stiffness: 300 }}
+          >
+            {/* Handle */}
+            <button
+              className="w-full pt-3 pb-2 flex justify-center"
+              onClick={() => {
+                if (selectedSpot) {
+                  setSheetExpanded(!sheetExpanded);
+                }
+              }}
+            >
+              <div className="w-10 h-1 rounded-full bg-border" />
+            </button>
+
+            {/* Filters */}
+            <div className="mb-3">
+              <FilterBar activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+            </div>
+
+            {/* Spot list */}
+            {selectedSpot && sheetExpanded ? (
+              <div className="px-4 pb-24 overflow-y-auto max-h-[60vh]">
                 <SpotCard
                   spot={selectedSpot}
                   onBook={setBookingSpot}
                   onNavigate={handleNavigate}
                 />
-              )}
-            </AnimatePresence>
-          </div>
+              </div>
+            ) : (
+              <div className="pb-24">
+                <div className="px-4 mb-2">
+                  <p className="text-xs font-medium text-muted-foreground">{availableSpots.length} spots nearby</p>
+                </div>
+                <div className="flex gap-3 px-4 overflow-x-auto no-scrollbar pb-4">
+                  {availableSpots.map((spot) => (
+                    <SpotCard
+                      key={spot.id}
+                      spot={spot}
+                      onBook={setBookingSpot}
+                      onNavigate={handleNavigate}
+                      compact
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </motion.div>
         </div>
       )}
 

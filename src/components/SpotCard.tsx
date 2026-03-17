@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Star, Zap, Shield, Car, Navigation, Clock } from "lucide-react";
+import { Star, Zap, Shield, MapPin, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { SpotMarker } from "./MapView";
 
@@ -7,83 +7,108 @@ interface SpotCardProps {
   spot: SpotMarker;
   onBook: (spot: SpotMarker) => void;
   onNavigate: (spot: SpotMarker) => void;
+  compact?: boolean;
 }
 
-export default function SpotCard({ spot, onBook, onNavigate }: SpotCardProps) {
+export default function SpotCard({ spot, onBook, onNavigate, compact = false }: SpotCardProps) {
   const typeLabel = spot.type === "driveway" ? "Driveway" : spot.type === "garage" ? "Garage" : "Parking Lot";
-  const typeIcon = spot.type === "garage" ? "🏢" : spot.type === "driveway" ? "🏠" : "🅿️";
+  const typeEmoji = spot.type === "garage" ? "🏢" : spot.type === "driveway" ? "🏠" : "🅿️";
+
+  if (compact) {
+    return (
+      <motion.button
+        className="soft-card p-3 w-[180px] shrink-0 text-left"
+        whileTap={{ scale: 0.97 }}
+        onClick={() => onBook(spot)}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <div className="flex items-start justify-between mb-2">
+          <span className="text-lg">{typeEmoji}</span>
+          <div className="flex items-center gap-0.5">
+            <Star className="w-3 h-3 text-warning fill-warning" />
+            <span className="text-xs font-medium text-foreground">{spot.rating}</span>
+          </div>
+        </div>
+        <p className="text-sm font-semibold text-foreground truncate">{spot.address}</p>
+        <p className="text-xs text-muted-foreground mb-2">{spot.distance} · {typeLabel}</p>
+        <div className="flex items-center gap-1.5">
+          <span className="font-display font-bold text-primary text-lg">${spot.price}</span>
+          <span className="text-xs text-muted-foreground">/hr</span>
+          {spot.hasEV && <Zap className="w-3.5 h-3.5 text-accent ml-auto" />}
+        </div>
+      </motion.button>
+    );
+  }
 
   return (
     <motion.div
-      className="glass-card p-4 mx-4 mb-3"
+      className="soft-card p-4 soft-shadow"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
       layout
     >
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-lg">{typeIcon}</span>
-            <h3 className="font-display font-semibold text-foreground">{spot.address}</h3>
+      <div className="flex items-start gap-3">
+        {/* Spot image placeholder */}
+        <div className="w-20 h-20 rounded-xl bg-secondary flex items-center justify-center text-2xl shrink-0">
+          {typeEmoji}
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between mb-1">
+            <h3 className="font-display font-bold text-foreground text-sm">{spot.address}</h3>
+            <div className="flex items-center gap-0.5 shrink-0 ml-2">
+              <Star className="w-3.5 h-3.5 text-warning fill-warning" />
+              <span className="text-xs font-semibold text-foreground">{spot.rating}</span>
+            </div>
           </div>
-          <div className="flex items-center gap-3 text-sm text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <Car className="w-3.5 h-3.5" />
-              {typeLabel}
+
+          <p className="text-xs text-muted-foreground mb-2">{spot.distance} · {typeLabel}</p>
+
+          {/* Tags */}
+          <div className="flex gap-1.5 mb-3 flex-wrap">
+            {spot.hasEV && (
+              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent/10 text-accent text-[10px] font-medium">
+                <Zap className="w-2.5 h-2.5" /> EV
+              </span>
+            )}
+            {spot.hasSecurity && (
+              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-medium">
+                <Shield className="w-2.5 h-2.5" /> Secured
+              </span>
+            )}
+            <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground text-[10px] font-medium">
+              <MapPin className="w-2.5 h-2.5" /> Available
             </span>
-            <span className="flex items-center gap-1">
-              <Navigation className="w-3.5 h-3.5" />
-              {spot.distance}
-            </span>
-            <span className="flex items-center gap-1">
-              <Star className="w-3.5 h-3.5 text-accent" />
-              {spot.rating}
-            </span>
+          </div>
+
+          {/* Price + actions */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-baseline gap-0.5">
+              <span className="font-display font-extrabold text-xl text-foreground">${spot.price}</span>
+              <span className="text-xs text-muted-foreground">/hr</span>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 rounded-full"
+                onClick={() => onNavigate(spot)}
+              >
+                <Navigation className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="cta"
+                size="sm"
+                className="rounded-full h-9 px-4"
+                onClick={() => onBook(spot)}
+              >
+                Book
+              </Button>
+            </div>
           </div>
         </div>
-        <div className="text-right">
-          <div className="font-display font-bold text-2xl text-primary">${spot.price}</div>
-          <div className="text-xs text-muted-foreground">per hour</div>
-        </div>
-      </div>
-
-      {/* Amenities */}
-      <div className="flex gap-2 mb-4">
-        {spot.hasEV && (
-          <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-spot-ev/10 text-spot-ev text-xs font-medium">
-            <Zap className="w-3 h-3" /> EV Charging
-          </span>
-        )}
-        {spot.hasSecurity && (
-          <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-success/10 text-success text-xs font-medium">
-            <Shield className="w-3 h-3" /> Secured
-          </span>
-        )}
-        {spot.available && (
-          <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
-            <Clock className="w-3 h-3" /> Available Now
-          </span>
-        )}
-      </div>
-
-      {/* Actions - thumb-friendly large buttons */}
-      <div className="flex gap-3">
-        <Button
-          variant="glow"
-          className="flex-1 h-12 text-base font-display font-semibold rounded-xl"
-          onClick={() => onBook(spot)}
-        >
-          Book Now
-        </Button>
-        <Button
-          variant="secondary"
-          size="icon"
-          className="h-12 w-12 rounded-xl"
-          onClick={() => onNavigate(spot)}
-        >
-          <Navigation className="w-5 h-5" />
-        </Button>
       </div>
     </motion.div>
   );

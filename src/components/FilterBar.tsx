@@ -1,13 +1,12 @@
 import { motion } from "framer-motion";
-import { ArrowUpDown, MapPin, Zap, Shield, SlidersHorizontal } from "lucide-react";
+import { SlidersHorizontal, Clock, Zap, DollarSign, ArrowDownUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const FILTERS = [
-  { label: "Price", icon: ArrowUpDown },
-  { label: "Distance", icon: MapPin },
+  { label: "Sort", icon: ArrowDownUp },
+  { label: "Price", icon: DollarSign },
   { label: "EV", icon: Zap },
-  { label: "Secure", icon: Shield },
-  { label: "More", icon: SlidersHorizontal },
+  { label: "Now", icon: Clock },
 ];
 
 interface FilterBarProps {
@@ -18,10 +17,10 @@ interface FilterBarProps {
 export default function FilterBar({ activeFilter, onFilterChange }: FilterBarProps) {
   return (
     <motion.div
-      className="flex gap-2 px-4 py-3 overflow-x-auto no-scrollbar"
-      initial={{ opacity: 0, y: -10 }}
+      className="flex gap-2 px-4 overflow-x-auto no-scrollbar"
+      initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.2 }}
+      transition={{ delay: 0.15 }}
     >
       {FILTERS.map((filter) => {
         const isActive = activeFilter === filter.label;
@@ -29,10 +28,10 @@ export default function FilterBar({ activeFilter, onFilterChange }: FilterBarPro
         return (
           <Button
             key={filter.label}
-            variant={isActive ? "default" : "pill"}
+            variant={isActive ? "default" : "outline"}
             size="sm"
             onClick={() => onFilterChange(isActive ? null : filter.label)}
-            className="shrink-0 gap-1.5"
+            className="shrink-0 gap-1.5 rounded-full h-8 px-3"
           >
             <Icon className="w-3.5 h-3.5" />
             {filter.label}
