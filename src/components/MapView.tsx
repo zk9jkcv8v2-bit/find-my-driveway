@@ -126,7 +126,7 @@ function LocateUser({ onLocate }: { onLocate: (pos: [number, number]) => void })
   useEffect(() => {
     navigator.geolocation?.getCurrentPosition(
       (pos) => onLocate([pos.coords.latitude, pos.coords.longitude]),
-      () => onLocate(SF_CENTER),
+      () => onLocate(OREBRO_CENTER),
       { timeout: 5000 }
     );
   }, []);
