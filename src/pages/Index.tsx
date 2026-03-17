@@ -153,6 +153,9 @@ export default function Index() {
         {bookingSpot && (
           <BookingSheet spot={bookingSpot} onClose={() => setBookingSpot(null)} onNavigate={handleNavigate} />
         )}
+        {chatSpot && (
+          <ChatSheet spot={chatSpot} onClose={() => setChatSpot(null)} />
+        )}
       </AnimatePresence>
     </div>
   );
