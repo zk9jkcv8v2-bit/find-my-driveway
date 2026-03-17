@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import spotDriveway from "@/assets/spot-driveway.jpg";
+import spotGarage from "@/assets/spot-garage.jpg";
+import spotLot from "@/assets/spot-lot.jpg";
 
 export interface SpotMarker {
   id: string;
@@ -18,13 +21,21 @@ export interface SpotMarker {
   image?: string;
 }
 
+const spotImages = { driveway: spotDriveway, garage: spotGarage, lot: spotLot };
+
 export const MOCK_SPOTS: SpotMarker[] = [
-  { id: "1", price: 5, type: "driveway", available: true, hasEV: false, hasSecurity: false, address: "Storgatan 12, Örebro", rating: 4.8, distance: "2 min walk", lat: 59.2753, lng: 15.2134 },
-  { id: "2", price: 8, type: "garage", available: true, hasEV: true, hasSecurity: true, address: "Drottninggatan 40, Örebro", rating: 4.9, distance: "4 min walk", lat: 59.2770, lng: 15.2060 },
-  { id: "3", price: 3, type: "driveway", available: true, hasEV: false, hasSecurity: false, address: "Kungsgatan 8, Örebro", rating: 4.2, distance: "6 min walk", lat: 59.2730, lng: 15.2180 },
-  { id: "4", price: 12, type: "garage", available: false, hasEV: true, hasSecurity: true, address: "Järnvägsgatan 5, Örebro", rating: 4.7, distance: "3 min walk", lat: 59.2790, lng: 15.2110 },
-  { id: "5", price: 6, type: "lot", available: true, hasEV: false, hasSecurity: true, address: "Fabriksgatan 22, Örebro", rating: 4.5, distance: "8 min walk", lat: 59.2710, lng: 15.2050 },
-  { id: "6", price: 4, type: "driveway", available: true, hasEV: false, hasSecurity: false, address: "Rudbecksgatan 15, Örebro", rating: 4.6, distance: "5 min walk", lat: 59.2765, lng: 15.2200 },
+  { id: "1", price: 5, type: "driveway", available: true, hasEV: false, hasSecurity: false, address: "Storgatan 12, Örebro", rating: 4.8, distance: "2 min walk", lat: 59.2753, lng: 15.2134, image: spotImages.driveway },
+  { id: "2", price: 8, type: "garage", available: true, hasEV: true, hasSecurity: true, address: "Drottninggatan 40, Örebro", rating: 4.9, distance: "4 min walk", lat: 59.2770, lng: 15.2060, image: spotImages.garage },
+  { id: "3", price: 3, type: "driveway", available: true, hasEV: false, hasSecurity: false, address: "Kungsgatan 8, Örebro", rating: 4.2, distance: "6 min walk", lat: 59.2730, lng: 15.2180, image: spotImages.driveway },
+  { id: "4", price: 12, type: "garage", available: false, hasEV: true, hasSecurity: true, address: "Järnvägsgatan 5, Örebro", rating: 4.7, distance: "3 min walk", lat: 59.2790, lng: 15.2110, image: spotImages.garage },
+  { id: "5", price: 6, type: "lot", available: true, hasEV: false, hasSecurity: true, address: "Fabriksgatan 22, Örebro", rating: 4.5, distance: "8 min walk", lat: 59.2710, lng: 15.2050, image: spotImages.lot },
+  { id: "6", price: 4, type: "driveway", available: true, hasEV: false, hasSecurity: false, address: "Rudbecksgatan 15, Örebro", rating: 4.6, distance: "5 min walk", lat: 59.2765, lng: 15.2200, image: spotImages.driveway },
+  { id: "7", price: 7, type: "lot", available: true, hasEV: true, hasSecurity: false, address: "Vasagatan 3, Örebro", rating: 4.3, distance: "7 min walk", lat: 59.2740, lng: 15.2000, image: spotImages.lot },
+  { id: "8", price: 10, type: "garage", available: true, hasEV: true, hasSecurity: true, address: "Trädgårdsgatan 18, Örebro", rating: 4.9, distance: "1 min walk", lat: 59.2760, lng: 15.2150, image: spotImages.garage },
+  { id: "9", price: 4, type: "driveway", available: true, hasEV: false, hasSecurity: false, address: "Nygatan 25, Örebro", rating: 4.1, distance: "10 min walk", lat: 59.2720, lng: 15.2230, image: spotImages.driveway },
+  { id: "10", price: 9, type: "lot", available: true, hasEV: false, hasSecurity: true, address: "Engelbrektsgatan 7, Örebro", rating: 4.6, distance: "5 min walk", lat: 59.2800, lng: 15.2080, image: spotImages.lot },
+  { id: "11", price: 6, type: "driveway", available: true, hasEV: false, hasSecurity: false, address: "Ånäsgatan 14, Örebro", rating: 4.4, distance: "9 min walk", lat: 59.2695, lng: 15.2120, image: spotImages.driveway },
+  { id: "12", price: 15, type: "garage", available: true, hasEV: true, hasSecurity: true, address: "Klostergatan 2, Örebro", rating: 5.0, distance: "2 min walk", lat: 59.2775, lng: 15.2170, image: spotImages.garage },
 ];
 
 const OREBRO_CENTER: [number, number] = [59.2753, 15.2134];
