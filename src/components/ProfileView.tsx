@@ -1,15 +1,293 @@
-import { motion } from "framer-motion";
-import { Star, Shield, Car, MapPin, ChevronRight, Bell, HelpCircle, LogOut } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Star, Shield, Car, MapPin, ChevronRight, Bell, HelpCircle, LogOut, ArrowLeft, Check, Plus, Trash2, Settings, Moon, Globe } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/hooks/use-toast";
 
-const MENU_ITEMS = [
-  { label: "Verification", icon: Shield, desc: "Identity verified", color: "text-accent" },
-  { label: "My Vehicles", icon: Car, desc: "2 vehicles added", color: "text-primary" },
-  { label: "Saved Spots", icon: MapPin, desc: "5 saved", color: "text-primary" },
-  { label: "Notifications", icon: Bell, desc: "All enabled", color: "text-primary" },
-  { label: "Help & Support", icon: HelpCircle, desc: "FAQ, disputes", color: "text-muted-foreground" },
+type SubScreen = "main" | "verification" | "vehicles" | "saved" | "notifications" | "help";
+
+const SAVED_SPOTS = [
+  { id: "1", address: "742 Valencia St", type: "Driveway", price: 5 },
+  { id: "2", address: "180 Mission St", type: "Garage", price: 8 },
+  { id: "3", address: "55 3rd St", type: "Driveway", price: 3 },
+  { id: "4", address: "888 Brannan St", type: "Lot", price: 6 },
+  { id: "5", address: "123 Folsom St", type: "Driveway", price: 4 },
+];
+
+const VEHICLES = [
+  { id: "1", make: "Tesla Model 3", plate: "7ABC123", color: "White", isEV: true },
+  { id: "2", make: "Honda Civic", plate: "8XYZ789", color: "Blue", isEV: false },
+];
+
+const FAQ = [
+  { q: "How do I book a parking spot?", a: "Tap any pin on the map, review details, and tap 'Book'. Choose your time and confirm payment." },
+  { q: "How do payouts work?", a: "Earnings accumulate in your balance. Tap 'Withdraw' in the Earnings tab to transfer to your bank (1–2 business days)." },
+  { q: "What if someone is in my spot?", a: "Contact support through this page. We'll resolve disputes within 24 hours and compensate for inconvenience." },
+  { q: "How do I cancel a booking?", a: "Go to your bookings and tap the booking you want to cancel. Free cancellation up to 1 hour before." },
 ];
 
 export default function ProfileView() {
+  const [subScreen, setSubScreen] = useState<SubScreen>("main");
+  const [notifBookings, setNotifBookings] = useState(true);
+  const [notifEarnings, setNotifEarnings] = useState(true);
+  const [notifPromo, setNotifPromo] = useState(false);
+  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+  const [savedSpots, setSavedSpots] = useState(SAVED_SPOTS);
+  const [vehicles, setVehicles] = useState(VEHICLES);
+
+  const BackButton = () => (
+    <button onClick={() => setSubScreen("main")} className="flex items-center gap-1 text-sm text-muted-foreground mb-6 hover:text-foreground transition-colors">
+      <ArrowLeft className="w-4 h-4" /> Back
+    </button>
+  );
+
+  if (subScreen === "verification") {
+    return (
+      <div className="min-h-screen bg-background pb-24 px-4 pt-14">
+        <BackButton />
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+          <h1 className="font-display font-extrabold text-2xl text-foreground mb-1">Verification</h1>
+          <p className="text-muted-foreground text-sm mb-6">Your identity verification status</p>
+        </motion.div>
+
+        <div className="space-y-3">
+          {[
+            { label: "Email Address", value: "jordan@email.com", verified: true },
+            { label: "Phone Number", value: "+1 (415) ***-4829", verified: true },
+            { label: "Driver's License", value: "Verified", verified: true },
+            { label: "Payment Method", value: "Visa •••• 1234", verified: true },
+          ].map((item, i) => (
+            <motion.div
+              key={item.label}
+              className="soft-card p-4 flex items-center gap-3"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+            >
+              <div className="w-9 h-9 rounded-full bg-accent/10 flex items-center justify-center">
+                <Check className="w-4 h-4 text-accent" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-foreground">{item.label}</p>
+                <p className="text-xs text-muted-foreground">{item.value}</p>
+              </div>
+              <span className="text-[10px] font-semibold text-accent bg-accent/10 px-2 py-0.5 rounded-full">Verified</span>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (subScreen === "vehicles") {
+    return (
+      <div className="min-h-screen bg-background pb-24 px-4 pt-14">
+        <BackButton />
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+          <h1 className="font-display font-extrabold text-2xl text-foreground mb-1">My Vehicles</h1>
+          <p className="text-muted-foreground text-sm mb-6">Manage your registered vehicles</p>
+        </motion.div>
+
+        <div className="space-y-3 mb-6">
+          {vehicles.map((v, i) => (
+            <motion.div
+              key={v.id}
+              className="soft-card p-4 flex items-center gap-3"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+            >
+              <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center">
+                <Car className="w-5 h-5 text-primary" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-semibold text-foreground">{v.make}</p>
+                  {v.isEV && <span className="text-[10px] font-medium text-accent bg-accent/10 px-1.5 py-0.5 rounded-full">EV</span>}
+                </div>
+                <p className="text-xs text-muted-foreground">{v.plate} · {v.color}</p>
+              </div>
+              <button
+                onClick={() => {
+                  setVehicles(vehicles.filter(x => x.id !== v.id));
+                  toast({ title: "Vehicle removed", description: `${v.make} has been removed.` });
+                }}
+                className="w-8 h-8 rounded-full hover:bg-destructive/10 flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </motion.div>
+          ))}
+        </div>
+
+        <Button
+          variant="outline"
+          size="lg"
+          className="w-full rounded-2xl gap-2"
+          onClick={() => {
+            const newId = String(vehicles.length + 1);
+            setVehicles([...vehicles, { id: newId, make: "New Vehicle", plate: "NEW-0000", color: "Black", isEV: false }]);
+            toast({ title: "Vehicle added", description: "Don't forget to update the details." });
+          }}
+        >
+          <Plus className="w-4 h-4" /> Add Vehicle
+        </Button>
+      </div>
+    );
+  }
+
+  if (subScreen === "saved") {
+    return (
+      <div className="min-h-screen bg-background pb-24 px-4 pt-14">
+        <BackButton />
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+          <h1 className="font-display font-extrabold text-2xl text-foreground mb-1">Saved Spots</h1>
+          <p className="text-muted-foreground text-sm mb-6">Your favorite parking spots</p>
+        </motion.div>
+
+        <div className="space-y-2">
+          {savedSpots.map((spot, i) => (
+            <motion.div
+              key={spot.id}
+              className="soft-card p-4 flex items-center gap-3"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.04 }}
+            >
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <MapPin className="w-5 h-5 text-primary" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-foreground">{spot.address}</p>
+                <p className="text-xs text-muted-foreground">{spot.type} · ${spot.price}/hr</p>
+              </div>
+              <button
+                onClick={() => {
+                  setSavedSpots(savedSpots.filter(s => s.id !== spot.id));
+                  toast({ title: "Spot removed", description: `${spot.address} removed from saved.` });
+                }}
+                className="w-8 h-8 rounded-full hover:bg-destructive/10 flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </motion.div>
+          ))}
+          {savedSpots.length === 0 && (
+            <div className="text-center py-12">
+              <MapPin className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
+              <p className="text-sm text-muted-foreground">No saved spots yet</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (subScreen === "notifications") {
+    return (
+      <div className="min-h-screen bg-background pb-24 px-4 pt-14">
+        <BackButton />
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+          <h1 className="font-display font-extrabold text-2xl text-foreground mb-1">Notifications</h1>
+          <p className="text-muted-foreground text-sm mb-6">Manage your notification preferences</p>
+        </motion.div>
+
+        <div className="space-y-1">
+          {[
+            { label: "Booking Updates", desc: "New bookings, cancellations, reminders", value: notifBookings, onChange: setNotifBookings },
+            { label: "Earnings Alerts", desc: "Payouts, new earnings, milestones", value: notifEarnings, onChange: setNotifEarnings },
+            { label: "Promotions", desc: "Deals, tips, and new features", value: notifPromo, onChange: setNotifPromo },
+          ].map((item, i) => (
+            <motion.div
+              key={item.label}
+              className="soft-card p-4 flex items-center gap-3"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+            >
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-foreground">{item.label}</p>
+                <p className="text-xs text-muted-foreground">{item.desc}</p>
+              </div>
+              <button
+                onClick={() => item.onChange(!item.value)}
+                className={`w-11 h-6 rounded-full flex items-center p-0.5 transition-colors ${
+                  item.value ? "bg-primary justify-end" : "bg-border justify-start"
+                }`}
+              >
+                <div className="w-5 h-5 rounded-full bg-white soft-shadow transition-transform" />
+              </button>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (subScreen === "help") {
+    return (
+      <div className="min-h-screen bg-background pb-24 px-4 pt-14">
+        <BackButton />
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+          <h1 className="font-display font-extrabold text-2xl text-foreground mb-1">Help & Support</h1>
+          <p className="text-muted-foreground text-sm mb-6">Frequently asked questions</p>
+        </motion.div>
+
+        <div className="space-y-2 mb-6">
+          {FAQ.map((item, i) => (
+            <motion.div
+              key={i}
+              className="soft-card overflow-hidden"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+            >
+              <button
+                onClick={() => setExpandedFaq(expandedFaq === i ? null : i)}
+                className="w-full p-4 flex items-center gap-3 text-left"
+              >
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-foreground">{item.q}</p>
+                </div>
+                <ChevronRight className={`w-4 h-4 text-muted-foreground transition-transform ${expandedFaq === i ? "rotate-90" : ""}`} />
+              </button>
+              <AnimatePresence>
+                {expandedFaq === i && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <p className="px-4 pb-4 text-sm text-muted-foreground">{item.a}</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          ))}
+        </div>
+
+        <Button
+          variant="outline"
+          size="lg"
+          className="w-full rounded-2xl"
+          onClick={() => toast({ title: "Support ticket created", description: "We'll get back to you within 24 hours." })}
+        >
+          Contact Support
+        </Button>
+      </div>
+    );
+  }
+
+  // Main profile
+  const MENU_ITEMS = [
+    { label: "Verification", icon: Shield, desc: "Identity verified", color: "text-accent", screen: "verification" as SubScreen },
+    { label: "My Vehicles", icon: Car, desc: `${vehicles.length} vehicles added`, color: "text-primary", screen: "vehicles" as SubScreen },
+    { label: "Saved Spots", icon: MapPin, desc: `${savedSpots.length} saved`, color: "text-primary", screen: "saved" as SubScreen },
+    { label: "Notifications", icon: Bell, desc: "Manage preferences", color: "text-primary", screen: "notifications" as SubScreen },
+    { label: "Help & Support", icon: HelpCircle, desc: "FAQ, disputes", color: "text-muted-foreground", screen: "help" as SubScreen },
+  ];
+
   return (
     <div className="min-h-screen bg-background pb-24 px-4 pt-14">
       {/* Profile header */}
@@ -21,10 +299,13 @@ export default function ProfileView() {
         <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-xl font-display font-extrabold text-primary">
           JD
         </div>
-        <div>
+        <div className="flex-1">
           <h1 className="font-display font-extrabold text-xl text-foreground">Jordan Doe</h1>
           <p className="text-sm text-muted-foreground">Member since 2024</p>
         </div>
+        <button className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+          <Settings className="w-4 h-4" />
+        </button>
       </motion.div>
 
       {/* Stats */}
@@ -62,9 +343,10 @@ export default function ProfileView() {
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 + i * 0.04 }}
+              onClick={() => setSubScreen(item.screen)}
             >
-              <div className={`w-9 h-9 rounded-xl bg-secondary flex items-center justify-center`}>
-                <Icon className={`w-4.5 h-4.5 ${item.color}`} />
+              <div className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center">
+                <Icon className={`w-[18px] h-[18px] ${item.color}`} />
               </div>
               <div className="flex-1 text-left">
                 <p className="text-sm font-semibold text-foreground">{item.label}</p>
@@ -82,6 +364,7 @@ export default function ProfileView() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
+        onClick={() => toast({ title: "Signed out", description: "You've been signed out successfully." })}
       >
         <LogOut className="w-4 h-4" />
         Sign Out
