@@ -87,6 +87,7 @@ export default function Index() {
                 setSheetExpanded(true);
               }}
               selectedSpot={selectedSpot}
+              spots={filteredSpots}
             />
           </div>
 
