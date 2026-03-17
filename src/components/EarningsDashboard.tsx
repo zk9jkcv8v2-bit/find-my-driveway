@@ -492,6 +492,84 @@ export default function EarningsDashboard() {
           Withdraw ${totalWeek}.00
         </Button>
       </motion.div>
+
+      {/* Payment Method Card */}
+      <motion.div
+        className="mt-6 mb-2"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.55 }}
+      >
+        <h2 className="font-display font-bold text-base text-foreground mb-3">Payment Method</h2>
+        <motion.div
+          className="rounded-2xl p-5 relative overflow-hidden"
+          style={{
+            background: "linear-gradient(135deg, hsl(var(--foreground)), hsl(var(--foreground) / 0.8))",
+          }}
+          whileTap={{ scale: 0.98 }}
+        >
+          {/* Card chip & contactless */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex gap-1.5">
+              <div className="w-8 h-6 rounded-sm bg-warning/80" />
+              <svg className="w-5 h-5 text-background/50 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M8.5 16.5a5 5 0 0 1 0-9" /><path d="M12 16.5a5 5 0 0 0 0-9" />
+              </svg>
+            </div>
+            <span className="text-background/60 text-xs font-semibold tracking-wider uppercase">Visa</span>
+          </div>
+
+          {/* Card number */}
+          <p className="text-background font-mono text-base tracking-[0.2em] mb-4">
+            •••• •••• •••• 4829
+          </p>
+
+          {/* Card details row */}
+          <div className="flex items-end justify-between">
+            <div>
+              <p className="text-background/50 text-[9px] uppercase tracking-wider mb-0.5">Card Holder</p>
+              <p className="text-background text-xs font-semibold">Jordan Mitchell</p>
+            </div>
+            <div>
+              <p className="text-background/50 text-[9px] uppercase tracking-wider mb-0.5">Expires</p>
+              <p className="text-background text-xs font-semibold">09/28</p>
+            </div>
+            <div>
+              <p className="text-background/50 text-[9px] uppercase tracking-wider mb-0.5">Balance</p>
+              <p className="text-background text-xs font-bold font-display">${animatedTotal > 0 ? animatedTotal.toLocaleString() : displayTotal.toLocaleString()}.00</p>
+            </div>
+          </div>
+
+          {/* Subtle pattern overlay */}
+          <div className="absolute inset-0 pointer-events-none opacity-[0.04]"
+            style={{
+              backgroundImage: "radial-gradient(circle at 20% 80%, hsl(var(--background)) 1px, transparent 1px), radial-gradient(circle at 80% 20%, hsl(var(--background)) 1px, transparent 1px)",
+              backgroundSize: "30px 30px",
+            }}
+          />
+        </motion.div>
+
+        {/* Quick actions under card */}
+        <div className="grid grid-cols-3 gap-2 mt-3">
+          {[
+            { icon: <CreditCard className="w-4 h-4" />, label: "Change Card" },
+            { icon: <Clock className="w-4 h-4" />, label: "History" },
+            { icon: <TrendingUp className="w-4 h-4" />, label: "Insights" },
+          ].map((action, i) => (
+            <motion.button
+              key={action.label}
+              className="soft-card p-3 flex flex-col items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 + i * 0.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {action.icon}
+              <span className="text-[10px] font-medium">{action.label}</span>
+            </motion.button>
+          ))}
+        </div>
+      </motion.div>
     </div>
   );
 }
