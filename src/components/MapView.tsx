@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from "react-leaflet";
+import { useEffect, useState } from "react";
+import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { Zap, Shield, Star } from "lucide-react";
 
 export interface SpotMarker {
   id: string;
@@ -31,54 +30,85 @@ export const MOCK_SPOTS: SpotMarker[] = [
 const SF_CENTER: [number, number] = [37.7749, -122.4194];
 
 function createPriceIcon(price: number, isSelected: boolean, hasEV: boolean) {
-  const bg = isSelected ? "hsl(217,91%,60%)" : hasEV ? "hsl(152,60%,48%)" : "#fff";
-  const color = isSelected || hasEV ? "#fff" : "hsl(220,20%,14%)";
-  const border = isSelected || hasEV ? "none" : "1px solid hsl(220,14%,92%)";
+  const bg = isSelected
+    ? "hsl(217, 91%, 60%)"
+    : hasEV
+      ? "hsl(152, 60%, 48%)"
+      : "#ffffff";
+  const color = isSelected || hasEV ? "#ffffff" : "hsl(220, 20%, 14%)";
   const shadow = isSelected
-    ? "0 4px 16px rgba(59,130,246,0.35)"
-    : "0 2px 12px rgba(0,0,0,0.08)";
-  const scale = isSelected ? "scale(1.15)" : "scale(1)";
+    ? "0 4px 14px rgba(59, 130, 246, 0.4)"
+    : "0 2px 8px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.06)";
+  const border = isSelected || hasEV ? "none" : "1.5px solid hsl(220, 14%, 90%)";
+  const size = isSelected ? "transform: scale(1.1);" : "";
+
+  const html = `
+    <div style="
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: ${bg};
+      color: ${color};
+      border: ${border};
+      box-shadow: ${shadow};
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 13px;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      white-space: nowrap;
+      ${size}
+      position: relative;
+      cursor: pointer;
+      line-height: 1;
+    ">
+      ${hasEV ? '<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:3px"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>' : ''}
+      $${price}
+      <div style="
+        position: absolute;
+        bottom: -4px;
+        left: 50%;
+        transform: translateX(-50%) rotate(45deg);
+        width: 8px;
+        height: 8px;
+        background: ${bg};
+        ${!isSelected && !hasEV ? `border-right: ${border}; border-bottom: ${border};` : ""}
+      "></div>
+    </div>
+  `;
 
   return L.divIcon({
-    className: "parkr-marker",
-    html: `<div style="
-      background:${bg};
-      color:${color};
-      border:${border};
-      box-shadow:${shadow};
-      transform:${scale};
-      padding:6px 10px;
-      border-radius:20px;
-      font-weight:700;
-      font-size:13px;
-      font-family:'Plus Jakarta Sans',system-ui,sans-serif;
-      white-space:nowrap;
-      transition:all 0.2s ease;
-      position:relative;
-    ">$${price}<div style="
-      position:absolute;
-      bottom:-5px;
-      left:50%;
-      transform:translateX(-50%) rotate(45deg);
-      width:8px;
-      height:8px;
-      background:${bg};
-      ${!isSelected && !hasEV ? `border-right:${border};border-bottom:${border};` : ""}
-    "></div></div>`,
-    iconSize: [0, 0],
-    iconAnchor: [0, 0],
+    className: "",
+    html,
+    iconSize: [60, 36],
+    iconAnchor: [30, 36],
   });
 }
 
 function createUserIcon() {
   return L.divIcon({
-    className: "parkr-user-loc",
-    html: `<div style="position:relative;width:16px;height:16px;">
-      <div style="width:16px;height:16px;border-radius:50%;background:hsl(217,91%,60%);border:3px solid #fff;box-shadow:0 2px 8px rgba(59,130,246,0.4);position:relative;z-index:2;"></div>
-      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;background:hsla(217,91%,60%,0.15);animation:pulse 2s infinite;"></div>
-    </div>`,
-    iconSize: [16, 16],
-    iconAnchor: [8, 8],
+    className: "",
+    html: `
+      <div style="position: relative; width: 18px; height: 18px;">
+        <div style="
+          width: 18px; height: 18px;
+          border-radius: 50%;
+          background: hsl(217, 91%, 60%);
+          border: 3px solid #fff;
+          box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+          position: relative; z-index: 2;
+        "></div>
+        <div style="
+          position: absolute; top: -11px; left: -11px;
+          width: 40px; height: 40px;
+          border-radius: 50%;
+          background: hsla(217, 91%, 60%, 0.12);
+          animation: parkr-pulse 2s ease-in-out infinite;
+        "></div>
+      </div>
+    `,
+    iconSize: [18, 18],
+    iconAnchor: [9, 9],
   });
 }
 
@@ -93,13 +123,9 @@ function FlyToSpot({ spot }: { spot: SpotMarker | null }) {
 }
 
 function LocateUser({ onLocate }: { onLocate: (pos: [number, number]) => void }) {
-  const map = useMap();
   useEffect(() => {
     navigator.geolocation?.getCurrentPosition(
-      (pos) => {
-        const loc: [number, number] = [pos.coords.latitude, pos.coords.longitude];
-        onLocate(loc);
-      },
+      (pos) => onLocate([pos.coords.latitude, pos.coords.longitude]),
       () => onLocate(SF_CENTER),
       { timeout: 5000 }
     );
@@ -118,10 +144,12 @@ export default function MapView({ onSpotSelect, selectedSpot }: MapViewProps) {
   return (
     <div className="relative w-full h-full">
       <style>{`
-        .parkr-marker { background: none !important; border: none !important; }
-        .parkr-user-loc { background: none !important; border: none !important; }
-        @keyframes pulse { 0%,100% { opacity:0.6; transform:translate(-50%,-50%) scale(1); } 50% { opacity:0; transform:translate(-50%,-50%) scale(2); } }
-        .leaflet-control-attribution { font-size: 9px !important; opacity: 0.6; }
+        @keyframes parkr-pulse {
+          0%, 100% { opacity: 0.6; transform: scale(1); }
+          50% { opacity: 0; transform: scale(2.2); }
+        }
+        .leaflet-control-attribution { font-size: 9px !important; opacity: 0.5; }
+        .leaflet-container { background: hsl(220, 14%, 96%); }
       `}</style>
       <MapContainer
         center={SF_CENTER}
@@ -136,11 +164,7 @@ export default function MapView({ onSpotSelect, selectedSpot }: MapViewProps) {
         />
         <FlyToSpot spot={selectedSpot} />
         <LocateUser onLocate={setUserPos} />
-
-        {/* User location */}
         <Marker position={userPos} icon={createUserIcon()} />
-
-        {/* Spot markers */}
         {MOCK_SPOTS.filter((s) => s.available).map((spot) => (
           <Marker
             key={spot.id}
