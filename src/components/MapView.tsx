@@ -136,6 +136,7 @@ function LocateUser({ onLocate }: { onLocate: (pos: [number, number]) => void })
 interface MapViewProps {
   onSpotSelect: (spot: SpotMarker) => void;
   selectedSpot: SpotMarker | null;
+  spots?: SpotMarker[];
 }
 
 export default function MapView({ onSpotSelect, selectedSpot }: MapViewProps) {
