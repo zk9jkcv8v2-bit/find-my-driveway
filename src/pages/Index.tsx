@@ -16,6 +16,7 @@ export default function Index() {
   const [activeTab, setActiveTab] = useState("discover");
   const [selectedSpot, setSelectedSpot] = useState<SpotMarker | null>(null);
   const [bookingSpot, setBookingSpot] = useState<SpotMarker | null>(null);
+  const [chatSpot, setChatSpot] = useState<SpotMarker | null>(null);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [sheetExpanded, setSheetExpanded] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
