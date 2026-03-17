@@ -19,15 +19,15 @@ export interface SpotMarker {
 }
 
 export const MOCK_SPOTS: SpotMarker[] = [
-  { id: "1", price: 5, type: "driveway", available: true, hasEV: false, hasSecurity: false, address: "742 Valencia St", rating: 4.8, distance: "2 min walk", lat: 37.7605, lng: -122.4212 },
-  { id: "2", price: 8, type: "garage", available: true, hasEV: true, hasSecurity: true, address: "180 Mission St", rating: 4.9, distance: "4 min walk", lat: 37.7912, lng: -122.3944 },
-  { id: "3", price: 3, type: "driveway", available: true, hasEV: false, hasSecurity: false, address: "55 3rd St", rating: 4.2, distance: "6 min walk", lat: 37.7855, lng: -122.4005 },
-  { id: "4", price: 12, type: "garage", available: false, hasEV: true, hasSecurity: true, address: "401 Hayes St", rating: 4.7, distance: "3 min walk", lat: 37.7763, lng: -122.4238 },
-  { id: "5", price: 6, type: "lot", available: true, hasEV: false, hasSecurity: true, address: "888 Brannan St", rating: 4.5, distance: "8 min walk", lat: 37.7716, lng: -122.4035 },
-  { id: "6", price: 4, type: "driveway", available: true, hasEV: false, hasSecurity: false, address: "123 Folsom St", rating: 4.6, distance: "5 min walk", lat: 37.7880, lng: -122.3920 },
+  { id: "1", price: 5, type: "driveway", available: true, hasEV: false, hasSecurity: false, address: "Storgatan 12, Örebro", rating: 4.8, distance: "2 min walk", lat: 59.2753, lng: 15.2134 },
+  { id: "2", price: 8, type: "garage", available: true, hasEV: true, hasSecurity: true, address: "Drottninggatan 40, Örebro", rating: 4.9, distance: "4 min walk", lat: 59.2770, lng: 15.2060 },
+  { id: "3", price: 3, type: "driveway", available: true, hasEV: false, hasSecurity: false, address: "Kungsgatan 8, Örebro", rating: 4.2, distance: "6 min walk", lat: 59.2730, lng: 15.2180 },
+  { id: "4", price: 12, type: "garage", available: false, hasEV: true, hasSecurity: true, address: "Järnvägsgatan 5, Örebro", rating: 4.7, distance: "3 min walk", lat: 59.2790, lng: 15.2110 },
+  { id: "5", price: 6, type: "lot", available: true, hasEV: false, hasSecurity: true, address: "Fabriksgatan 22, Örebro", rating: 4.5, distance: "8 min walk", lat: 59.2710, lng: 15.2050 },
+  { id: "6", price: 4, type: "driveway", available: true, hasEV: false, hasSecurity: false, address: "Rudbecksgatan 15, Örebro", rating: 4.6, distance: "5 min walk", lat: 59.2765, lng: 15.2200 },
 ];
 
-const SF_CENTER: [number, number] = [37.7749, -122.4194];
+const OREBRO_CENTER: [number, number] = [59.2753, 15.2134];
 
 function createPriceIcon(price: number, isSelected: boolean, hasEV: boolean) {
   const bg = isSelected
