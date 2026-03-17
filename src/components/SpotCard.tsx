@@ -95,6 +95,16 @@ export default function SpotCard({ spot, onBook, onNavigate, onChat, compact = f
               <span className="text-xs text-muted-foreground">/hr</span>
             </div>
             <div className="flex gap-2">
+              {onChat && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9 rounded-full"
+                  onClick={() => onChat(spot)}
+                >
+                  <MessageCircle className="w-4 h-4" />
+                </Button>
+              )}
               <Button
                 variant="ghost"
                 size="icon"
