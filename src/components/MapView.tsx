@@ -1,5 +1,7 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import { Zap, Shield, Star } from "lucide-react";
 
 export interface SpotMarker {
@@ -12,17 +14,98 @@ export interface SpotMarker {
   address: string;
   rating: number;
   distance: string;
+  lat: number;
+  lng: number;
   image?: string;
 }
 
 export const MOCK_SPOTS: SpotMarker[] = [
-  { id: "1", price: 5, type: "driveway", available: true, hasEV: false, hasSecurity: false, address: "742 Valencia St", rating: 4.8, distance: "2 min walk" },
-  { id: "2", price: 8, type: "garage", available: true, hasEV: true, hasSecurity: true, address: "180 Mission St", rating: 4.9, distance: "4 min walk" },
-  { id: "3", price: 3, type: "driveway", available: true, hasEV: false, hasSecurity: false, address: "55 3rd St", rating: 4.2, distance: "6 min walk" },
-  { id: "4", price: 12, type: "garage", available: false, hasEV: true, hasSecurity: true, address: "401 Hayes St", rating: 4.7, distance: "3 min walk" },
-  { id: "5", price: 6, type: "lot", available: true, hasEV: false, hasSecurity: true, address: "888 Brannan St", rating: 4.5, distance: "8 min walk" },
-  { id: "6", price: 4, type: "driveway", available: true, hasEV: false, hasSecurity: false, address: "123 Folsom St", rating: 4.6, distance: "5 min walk" },
+  { id: "1", price: 5, type: "driveway", available: true, hasEV: false, hasSecurity: false, address: "742 Valencia St", rating: 4.8, distance: "2 min walk", lat: 37.7605, lng: -122.4212 },
+  { id: "2", price: 8, type: "garage", available: true, hasEV: true, hasSecurity: true, address: "180 Mission St", rating: 4.9, distance: "4 min walk", lat: 37.7912, lng: -122.3944 },
+  { id: "3", price: 3, type: "driveway", available: true, hasEV: false, hasSecurity: false, address: "55 3rd St", rating: 4.2, distance: "6 min walk", lat: 37.7855, lng: -122.4005 },
+  { id: "4", price: 12, type: "garage", available: false, hasEV: true, hasSecurity: true, address: "401 Hayes St", rating: 4.7, distance: "3 min walk", lat: 37.7763, lng: -122.4238 },
+  { id: "5", price: 6, type: "lot", available: true, hasEV: false, hasSecurity: true, address: "888 Brannan St", rating: 4.5, distance: "8 min walk", lat: 37.7716, lng: -122.4035 },
+  { id: "6", price: 4, type: "driveway", available: true, hasEV: false, hasSecurity: false, address: "123 Folsom St", rating: 4.6, distance: "5 min walk", lat: 37.7880, lng: -122.3920 },
 ];
+
+const SF_CENTER: [number, number] = [37.7749, -122.4194];
+
+function createPriceIcon(price: number, isSelected: boolean, hasEV: boolean) {
+  const bg = isSelected ? "hsl(217,91%,60%)" : hasEV ? "hsl(152,60%,48%)" : "#fff";
+  const color = isSelected || hasEV ? "#fff" : "hsl(220,20%,14%)";
+  const border = isSelected || hasEV ? "none" : "1px solid hsl(220,14%,92%)";
+  const shadow = isSelected
+    ? "0 4px 16px rgba(59,130,246,0.35)"
+    : "0 2px 12px rgba(0,0,0,0.08)";
+  const scale = isSelected ? "scale(1.15)" : "scale(1)";
+
+  return L.divIcon({
+    className: "parkr-marker",
+    html: `<div style="
+      background:${bg};
+      color:${color};
+      border:${border};
+      box-shadow:${shadow};
+      transform:${scale};
+      padding:6px 10px;
+      border-radius:20px;
+      font-weight:700;
+      font-size:13px;
+      font-family:'Plus Jakarta Sans',system-ui,sans-serif;
+      white-space:nowrap;
+      transition:all 0.2s ease;
+      position:relative;
+    ">$${price}<div style="
+      position:absolute;
+      bottom:-5px;
+      left:50%;
+      transform:translateX(-50%) rotate(45deg);
+      width:8px;
+      height:8px;
+      background:${bg};
+      ${!isSelected && !hasEV ? `border-right:${border};border-bottom:${border};` : ""}
+    "></div></div>`,
+    iconSize: [0, 0],
+    iconAnchor: [0, 0],
+  });
+}
+
+function createUserIcon() {
+  return L.divIcon({
+    className: "parkr-user-loc",
+    html: `<div style="position:relative;width:16px;height:16px;">
+      <div style="width:16px;height:16px;border-radius:50%;background:hsl(217,91%,60%);border:3px solid #fff;box-shadow:0 2px 8px rgba(59,130,246,0.4);position:relative;z-index:2;"></div>
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;background:hsla(217,91%,60%,0.15);animation:pulse 2s infinite;"></div>
+    </div>`,
+    iconSize: [16, 16],
+    iconAnchor: [8, 8],
+  });
+}
+
+function FlyToSpot({ spot }: { spot: SpotMarker | null }) {
+  const map = useMap();
+  useEffect(() => {
+    if (spot) {
+      map.flyTo([spot.lat, spot.lng], 16, { duration: 0.8 });
+    }
+  }, [spot, map]);
+  return null;
+}
+
+function LocateUser({ onLocate }: { onLocate: (pos: [number, number]) => void }) {
+  const map = useMap();
+  useEffect(() => {
+    navigator.geolocation?.getCurrentPosition(
+      (pos) => {
+        const loc: [number, number] = [pos.coords.latitude, pos.coords.longitude];
+        onLocate(loc);
+      },
+      () => onLocate(SF_CENTER),
+      { timeout: 5000 }
+    );
+  }, []);
+  return null;
+}
 
 interface MapViewProps {
   onSpotSelect: (spot: SpotMarker) => void;
@@ -30,100 +113,43 @@ interface MapViewProps {
 }
 
 export default function MapView({ onSpotSelect, selectedSpot }: MapViewProps) {
-  // Spot positions on the simulated map
-  const spotPositions = [
-    { x: 25, y: 30 },
-    { x: 60, y: 25 },
-    { x: 40, y: 50 },
-    { x: 75, y: 45 },
-    { x: 20, y: 65 },
-    { x: 55, y: 70 },
-  ];
+  const [userPos, setUserPos] = useState<[number, number]>(SF_CENTER);
 
   return (
-    <div className="relative w-full h-full overflow-hidden">
-      {/* Light map background */}
-      <div className="absolute inset-0 bg-[#f0ede6]">
-        {/* Simulated streets */}
-        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 600" preserveAspectRatio="none">
-          {/* Major roads */}
-          <rect x="0" y="120" width="400" height="8" fill="#fff" rx="1" />
-          <rect x="0" y="280" width="400" height="10" fill="#fff" rx="1" />
-          <rect x="0" y="420" width="400" height="8" fill="#fff" rx="1" />
-          <rect x="100" y="0" width="8" height="600" fill="#fff" rx="1" />
-          <rect x="250" y="0" width="10" height="600" fill="#fff" rx="1" />
-          <rect x="340" y="0" width="8" height="600" fill="#fff" rx="1" />
-
-          {/* Minor roads */}
-          <rect x="0" y="190" width="400" height="4" fill="#faf8f4" rx="1" />
-          <rect x="0" y="350" width="400" height="4" fill="#faf8f4" rx="1" />
-          <rect x="0" y="500" width="400" height="4" fill="#faf8f4" rx="1" />
-          <rect x="170" y="0" width="4" height="600" fill="#faf8f4" rx="1" />
-          <rect x="50" y="0" width="4" height="600" fill="#faf8f4" rx="1" />
-
-          {/* Building blocks */}
-          <rect x="55" y="130" width="40" height="55" fill="#e8e5de" rx="3" />
-          <rect x="110" y="130" width="55" height="55" fill="#e8e5de" rx="3" />
-          <rect x="260" y="130" width="70" height="55" fill="#e8e5de" rx="3" />
-          <rect x="55" y="200" width="40" height="70" fill="#e8e5de" rx="3" />
-          <rect x="110" y="200" width="55" height="70" fill="#e8e5de" rx="3" />
-          <rect x="175" y="290" width="70" height="55" fill="#e8e5de" rx="3" />
-          <rect x="260" y="290" width="70" height="55" fill="#e8e5de" rx="3" />
-          <rect x="55" y="290" width="40" height="55" fill="#e8e5de" rx="3" />
-          <rect x="110" y="360" width="55" height="55" fill="#e8e5de" rx="3" />
-          <rect x="260" y="430" width="70" height="60" fill="#e8e5de" rx="3" />
-          <rect x="55" y="430" width="40" height="60" fill="#e8e5de" rx="3" />
-
-          {/* Parks/green areas */}
-          <rect x="175" y="130" width="70" height="55" fill="#d4e8d0" rx="6" />
-          <rect x="175" y="430" width="70" height="60" fill="#d4e8d0" rx="6" />
-        </svg>
-
-        {/* Spot markers */}
-        {MOCK_SPOTS.filter(s => s.available).map((spot, index) => {
-          const pos = spotPositions[index];
-          if (!pos) return null;
-          const isSelected = selectedSpot?.id === spot.id;
-
-          return (
-            <motion.button
-              key={spot.id}
-              className="absolute z-10"
-              style={{ left: `${pos.x}%`, top: `${pos.y}%`, transform: "translate(-50%, -50%)" }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => onSpotSelect(spot)}
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: index * 0.08, type: "spring", stiffness: 400, damping: 20 }}
-            >
-              <div className={`
-                relative px-2.5 py-1.5 rounded-full font-display font-bold text-xs
-                transition-all duration-200
-                ${isSelected
-                  ? "bg-primary text-primary-foreground soft-shadow-lg scale-110"
-                  : spot.hasEV
-                    ? "bg-accent text-accent-foreground soft-shadow"
-                    : "bg-card text-foreground soft-shadow border border-border/60"
-                }
-              `}>
-                ${spot.price}
-                {/* Arrow */}
-                <div className={`absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 ${
-                  isSelected ? "bg-primary" : spot.hasEV ? "bg-accent" : "bg-card border-r border-b border-border/60"
-                }`} />
-              </div>
-            </motion.button>
-          );
-        })}
+    <div className="relative w-full h-full">
+      <style>{`
+        .parkr-marker { background: none !important; border: none !important; }
+        .parkr-user-loc { background: none !important; border: none !important; }
+        @keyframes pulse { 0%,100% { opacity:0.6; transform:translate(-50%,-50%) scale(1); } 50% { opacity:0; transform:translate(-50%,-50%) scale(2); } }
+        .leaflet-control-attribution { font-size: 9px !important; opacity: 0.6; }
+      `}</style>
+      <MapContainer
+        center={SF_CENTER}
+        zoom={14}
+        className="w-full h-full z-0"
+        zoomControl={false}
+        attributionControl={true}
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://carto.com/">CARTO</a>'
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+        />
+        <FlyToSpot spot={selectedSpot} />
+        <LocateUser onLocate={setUserPos} />
 
         {/* User location */}
-        <div className="absolute top-[48%] left-[48%] -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none">
-          <div className="relative">
-            <div className="w-4 h-4 rounded-full bg-primary border-[3px] border-card soft-shadow" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-primary/10 animate-ping" />
-          </div>
-        </div>
-      </div>
+        <Marker position={userPos} icon={createUserIcon()} />
+
+        {/* Spot markers */}
+        {MOCK_SPOTS.filter((s) => s.available).map((spot) => (
+          <Marker
+            key={spot.id}
+            position={[spot.lat, spot.lng]}
+            icon={createPriceIcon(spot.price, selectedSpot?.id === spot.id, spot.hasEV)}
+            eventHandlers={{ click: () => onSpotSelect(spot) }}
+          />
+        ))}
+      </MapContainer>
     </div>
   );
 }

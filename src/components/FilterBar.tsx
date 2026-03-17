@@ -1,12 +1,12 @@
 import { motion } from "framer-motion";
-import { SlidersHorizontal, Clock, Zap, DollarSign, ArrowDownUp } from "lucide-react";
+import { ArrowDownUp, DollarSign, Zap, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const FILTERS = [
-  { label: "Sort", icon: ArrowDownUp },
-  { label: "Price", icon: DollarSign },
+  { label: "Nearest", icon: MapPin },
+  { label: "Cheapest", icon: DollarSign },
   { label: "EV", icon: Zap },
-  { label: "Now", icon: Clock },
+  { label: "Garage", icon: ArrowDownUp },
 ];
 
 interface FilterBarProps {
