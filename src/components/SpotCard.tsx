@@ -50,10 +50,14 @@ export default function SpotCard({ spot, onBook, onNavigate, compact = false }: 
       layout
     >
       <div className="flex items-start gap-3">
-        {/* Spot image placeholder */}
-        <div className="w-20 h-20 rounded-xl bg-secondary flex items-center justify-center text-2xl shrink-0">
-          {typeEmoji}
-        </div>
+        {/* Spot image */}
+        {spot.image ? (
+          <img src={spot.image} alt={spot.address} className="w-20 h-20 rounded-xl object-cover shrink-0" />
+        ) : (
+          <div className="w-20 h-20 rounded-xl bg-secondary flex items-center justify-center text-2xl shrink-0">
+            {typeEmoji}
+          </div>
+        )}
 
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between mb-1">
