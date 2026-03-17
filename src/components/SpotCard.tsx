@@ -11,7 +11,7 @@ interface SpotCardProps {
   compact?: boolean;
 }
 
-export default function SpotCard({ spot, onBook, onNavigate, compact = false }: SpotCardProps) {
+export default function SpotCard({ spot, onBook, onNavigate, onChat, compact = false }: SpotCardProps) {
   const typeLabel = spot.type === "driveway" ? "Driveway" : spot.type === "garage" ? "Garage" : "Parking Lot";
   const typeEmoji = spot.type === "garage" ? "🏢" : spot.type === "driveway" ? "🏠" : "🅿️";
 
