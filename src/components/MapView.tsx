@@ -152,7 +152,7 @@ export default function MapView({ onSpotSelect, selectedSpot }: MapViewProps) {
         .leaflet-container { background: hsl(220, 14%, 96%); }
       `}</style>
       <MapContainer
-        center={SF_CENTER}
+        center={OREBRO_CENTER}
         zoom={14}
         className="w-full h-full z-0"
         zoomControl={false}
