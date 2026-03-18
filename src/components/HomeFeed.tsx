@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Search, X, Star, Zap, ChevronDown, ParkingCircle, Calendar, Music, Building2, Gift, MapPin, Dumbbell, GraduationCap, Landmark, ShoppingBag } from "lucide-react";
+import { Search, X, Star, Zap, ChevronDown, Calendar, Music, Building2, Gift, MapPin, Dumbbell, GraduationCap, Landmark, ShoppingBag } from "lucide-react";
 import { MOCK_SPOTS, type SpotMarker } from "./MapView";
 
 const FILTERS = [
