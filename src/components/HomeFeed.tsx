@@ -137,10 +137,9 @@ export default function HomeFeed({ onBook, onNavigateToExplore }: HomeFeedProps)
 
               <button
                 onClick={() => onBook(spot)}
-                className="w-full mt-2 flex items-center justify-center gap-2 py-2.5 rounded-lg font-bold text-sm transition-colors"
-                style={{ backgroundColor: "hsl(var(--warning))", color: "hsl(var(--foreground))" }}
+                className="w-full mt-2 flex items-center justify-center gap-2 py-2.5 rounded-lg font-bold text-sm transition-colors bg-primary text-primary-foreground"
               >
-                <ParkingCircle className="w-4 h-4" />
+                🚗
                 Park now
               </button>
             </div>
