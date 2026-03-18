@@ -63,6 +63,15 @@ export default function ProfileView() {
     </button>
   );
 
+  if (subScreen === "earnings") {
+    return (
+      <div className="min-h-screen bg-background pb-24 px-4 pt-14">
+        <BackButton />
+        <EarningsDashboard />
+      </div>
+    );
+  }
+
   if (subScreen === "verification") {
     return (
       <div className="min-h-screen bg-background pb-24 px-4 pt-14">
