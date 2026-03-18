@@ -34,7 +34,14 @@ export interface SpotMarker {
   host: HostProfile;
 }
 
-const spotImages = { driveway: spotDriveway, garage: spotGarage, lot: spotLot };
+const spotImages = {
+  driveway: spotResidential,
+  garage: spotCityGarage,
+  lot: spotShoppingLot,
+  office: spotOffice,
+  underground: spotUnderground,
+  privateGarage: spotPrivateGarage,
+};
 
 const HOSTS: HostProfile[] = [
   { name: "Erik Lindberg", avatar: "https://i.pravatar.cc/150?img=12", responseTime: "< 5 min", verified: true, memberSince: "2023", totalSpots: 2 },
