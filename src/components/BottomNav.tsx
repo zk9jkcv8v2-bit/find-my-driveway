@@ -10,7 +10,7 @@ const TABS = [
   { id: "explore", label: "Explore", icon: Compass },
   { id: "list", label: "Host", icon: PlusCircle, center: true },
   { id: "activity", label: "Activity", icon: Bell },
-  { id: "profile", label: "Account", icon: User },
+  { id: "profile", label: "Profile", icon: User },
 ];
 
 export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
