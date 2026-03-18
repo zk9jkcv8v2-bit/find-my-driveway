@@ -9,11 +9,13 @@ import BottomNav from "@/components/BottomNav";
 import EarningsDashboard from "@/components/EarningsDashboard";
 import ListSpotWizard from "@/components/ListSpotWizard";
 import ProfileView from "@/components/ProfileView";
+import HomeFeed from "@/components/HomeFeed";
+import ActivityView from "@/components/ActivityView";
 import { toast } from "@/hooks/use-toast";
 import { Search, X } from "lucide-react";
 
 export default function Index() {
-  const [activeTab, setActiveTab] = useState("discover");
+  const [activeTab, setActiveTab] = useState("home");
   const [selectedSpot, setSelectedSpot] = useState<SpotMarker | null>(null);
   const [bookingSpot, setBookingSpot] = useState<SpotMarker | null>(null);
   const [chatSpot, setChatSpot] = useState<SpotMarker | null>(null);
@@ -27,16 +29,20 @@ export default function Index() {
     window.open(url, "_blank");
   };
 
+  const handleNavigateToExplore = (spot: SpotMarker) => {
+    setSelectedSpot(spot);
+    setSheetExpanded(true);
+    setActiveTab("explore");
+  };
+
   const filteredSpots = useMemo(() => {
     let spots = MOCK_SPOTS.filter((s) => s.available);
 
-    // Search filter
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       spots = spots.filter((s) => s.address.toLowerCase().includes(q));
     }
 
-    // Active filter
     if (activeFilter === "Cheapest") {
       spots = [...spots].sort((a, b) => a.price - b.price);
     } else if (activeFilter === "EV") {
@@ -52,7 +58,11 @@ export default function Index() {
 
   return (
     <div className="h-screen w-screen overflow-hidden bg-background">
-      {activeTab === "discover" && (
+      {activeTab === "home" && (
+        <HomeFeed onBook={setBookingSpot} onNavigateToExplore={handleNavigateToExplore} />
+      )}
+
+      {activeTab === "explore" && (
         <div className="h-full flex flex-col relative">
           {/* Search bar */}
           <motion.div
@@ -145,6 +155,7 @@ export default function Index() {
 
       {activeTab === "list" && <div className="h-full overflow-y-auto"><ListSpotWizard /></div>}
       {activeTab === "earnings" && <EarningsDashboard />}
+      {activeTab === "activity" && <ActivityView />}
       {activeTab === "profile" && <div className="h-full overflow-y-auto"><ProfileView /></div>}
 
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
