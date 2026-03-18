@@ -5,7 +5,7 @@ import EarningsDashboard from "@/components/EarningsDashboard";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 
-type SubScreen = "main" | "verification" | "vehicles" | "saved" | "notifications" | "help" | "settings";
+type SubScreen = "main" | "verification" | "vehicles" | "saved" | "notifications" | "help" | "settings" | "earnings";
 type ThemeMode = "light" | "dark" | "system";
 
 const SAVED_SPOTS = [
