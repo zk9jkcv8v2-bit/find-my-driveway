@@ -46,7 +46,7 @@ export default function HomeFeed({ onBook, onNavigateToExplore }: HomeFeedProps)
       {/* Header */}
       <div className="pt-12 px-4 pb-2 flex items-center justify-center">
         <div className="flex items-center gap-1">
-          <span className="font-display text-base font-bold text-foreground">Excelsior, MN</span>
+          <span className="font-display text-base font-bold text-foreground">Örebro, Sweden</span>
           <ChevronDown className="w-4 h-4 text-muted-foreground" />
         </div>
       </div>
