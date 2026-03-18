@@ -46,7 +46,7 @@ export default function HomeFeed({ onBook, onNavigateToExplore }: HomeFeedProps)
       {/* Header */}
       <div className="pt-12 px-4 pb-2 flex items-center justify-center">
         <div className="flex items-center gap-1">
-          <span className="font-display text-base font-bold text-foreground">Excelsior, MN</span>
+          <span className="font-display text-base font-bold text-foreground">Örebro, Sweden</span>
           <ChevronDown className="w-4 h-4 text-muted-foreground" />
         </div>
       </div>
@@ -114,9 +114,8 @@ export default function HomeFeed({ onBook, onNavigateToExplore }: HomeFeedProps)
                 </div>
               )}
               {/* Distance badge */}
-              <span className="absolute top-3 left-3 text-[11px] font-bold px-2.5 py-1 rounded"
-                style={{ backgroundColor: "hsl(var(--warning))", color: "hsl(var(--foreground))" }}>
-                ⚡ {spot.distance}
+              <span className="absolute top-3 left-3 text-[11px] font-bold px-2.5 py-1 rounded bg-accent text-accent-foreground">
+                📍 {spot.distance}
               </span>
             </button>
 
@@ -138,10 +137,9 @@ export default function HomeFeed({ onBook, onNavigateToExplore }: HomeFeedProps)
 
               <button
                 onClick={() => onBook(spot)}
-                className="w-full mt-2 flex items-center justify-center gap-2 py-2.5 rounded-lg font-bold text-sm transition-colors"
-                style={{ backgroundColor: "hsl(var(--warning))", color: "hsl(var(--foreground))" }}
+                className="w-full mt-2 flex items-center justify-center gap-2 py-2.5 rounded-lg font-bold text-sm transition-colors bg-primary text-primary-foreground"
               >
-                <ParkingCircle className="w-4 h-4" />
+                🚗
                 Park now
               </button>
             </div>
