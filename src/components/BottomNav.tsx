@@ -16,19 +16,22 @@ const TABS = [
 export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40">
-      {/* Smooth SVG bump notch */}
+      {/* Smooth SVG bump notch - overlaps border-t */}
       <svg
-        className="absolute left-1/2 -translate-x-1/2 -top-[28px] z-10"
-        width="90"
-        height="32"
-        viewBox="0 0 90 32"
+        className="absolute left-1/2 -translate-x-1/2 -top-[26px] z-20 drop-shadow-none"
+        width="96"
+        height="30"
+        viewBox="0 0 96 30"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M0 32 C0 32 12 32 22 20 C32 8 35 0 45 0 C55 0 58 8 68 20 C78 32 90 32 90 32"
-          className="fill-card"
+          d="M0 30 C10 30 18 30 28 16 C34 7 38 0 48 0 C58 0 62 7 68 16 C78 30 86 30 96 30"
+          className="fill-card stroke-border"
+          strokeWidth="1"
         />
+        {/* Cover the bottom stroke so it blends into the bar */}
+        <rect x="0" y="28" width="96" height="4" className="fill-card" />
       </svg>
 
       {/* Nav bar */}
