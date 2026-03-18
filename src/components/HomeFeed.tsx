@@ -114,9 +114,8 @@ export default function HomeFeed({ onBook, onNavigateToExplore }: HomeFeedProps)
                 </div>
               )}
               {/* Distance badge */}
-              <span className="absolute top-3 left-3 text-[11px] font-bold px-2.5 py-1 rounded"
-                style={{ backgroundColor: "hsl(var(--warning))", color: "hsl(var(--foreground))" }}>
-                ⚡ {spot.distance}
+              <span className="absolute top-3 left-3 text-[11px] font-bold px-2.5 py-1 rounded bg-accent text-accent-foreground">
+                📍 {spot.distance}
               </span>
             </button>
 
