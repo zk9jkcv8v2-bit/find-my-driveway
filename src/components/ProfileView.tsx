@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Star, Shield, Car, MapPin, ChevronRight, Bell, HelpCircle, LogOut, ArrowLeft, Check, Plus, Trash2, Settings, Moon, Sun, Globe, Palette } from "lucide-react";
+import { Star, Shield, Car, MapPin, ChevronRight, Bell, HelpCircle, LogOut, ArrowLeft, Check, Plus, Trash2, Settings, Moon, Sun, Globe, Palette, DollarSign } from "lucide-react";
+import EarningsDashboard from "@/components/EarningsDashboard";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 
-type SubScreen = "main" | "verification" | "vehicles" | "saved" | "notifications" | "help" | "settings";
+type SubScreen = "main" | "verification" | "vehicles" | "saved" | "notifications" | "help" | "settings" | "earnings";
 type ThemeMode = "light" | "dark" | "system";
 
 const SAVED_SPOTS = [
@@ -61,6 +62,15 @@ export default function ProfileView() {
       <ArrowLeft className="w-4 h-4" /> Back
     </button>
   );
+
+  if (subScreen === "earnings") {
+    return (
+      <div className="min-h-screen bg-background pb-24 px-4 pt-14">
+        <BackButton />
+        <EarningsDashboard />
+      </div>
+    );
+  }
 
   if (subScreen === "verification") {
     return (
@@ -401,6 +411,7 @@ export default function ProfileView() {
 
   // Main profile
   const MENU_ITEMS = [
+    { label: "Earnings", icon: DollarSign, desc: "View your host earnings", color: "text-accent", screen: "earnings" as SubScreen },
     { label: "Settings", icon: Settings, desc: "Theme, language, preferences", color: "text-muted-foreground", screen: "settings" as SubScreen },
     { label: "Verification", icon: Shield, desc: "Identity verified", color: "text-accent", screen: "verification" as SubScreen },
     { label: "My Vehicles", icon: Car, desc: `${vehicles.length} vehicles added`, color: "text-primary", screen: "vehicles" as SubScreen },
