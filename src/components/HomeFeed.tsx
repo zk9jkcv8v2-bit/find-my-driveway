@@ -115,7 +115,7 @@ export default function HomeFeed({ onBook, onNavigateToExplore }: HomeFeedProps)
               )}
               {/* Distance badge */}
               <span className="absolute top-3 left-3 text-[11px] font-bold px-2.5 py-1 rounded bg-accent text-accent-foreground">
-                📍 {spot.distance}
+                {spot.distance}
               </span>
             </button>
 
