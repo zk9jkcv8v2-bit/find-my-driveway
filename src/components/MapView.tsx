@@ -2,9 +2,12 @@ import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import spotDriveway from "@/assets/spot-driveway.jpg";
-import spotGarage from "@/assets/spot-garage.jpg";
-import spotLot from "@/assets/spot-lot.jpg";
+import spotResidential from "@/assets/spot-residential-1.jpg";
+import spotCityGarage from "@/assets/spot-city-garage-1.jpg";
+import spotOffice from "@/assets/spot-office-1.jpg";
+import spotUnderground from "@/assets/spot-underground-1.jpg";
+import spotShoppingLot from "@/assets/spot-shopping-lot.jpg";
+import spotPrivateGarage from "@/assets/spot-private-garage.jpg";
 
 export interface HostProfile {
   name: string;
