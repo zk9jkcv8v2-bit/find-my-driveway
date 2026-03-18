@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.cdnfonts.com/css/neue-haas-grotesk-display-pro');
 
 @tailwind base;
 @tailwind components;
@@ -15,7 +16,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 20% 14%;
 
-    --primary: 217 91% 60%;
+    --primary: 184 65% 45%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 220 14% 96%;
@@ -32,25 +33,25 @@
 
     --border: 220 14% 92%;
     --input: 220 14% 92%;
-    --ring: 217 91% 60%;
+    --ring: 184 65% 45%;
 
     --radius: 0.75rem;
 
     --success: 152 60% 48%;
     --warning: 38 92% 55%;
     --earning: 152 60% 48%;
-    --spot-available: 217 91% 60%;
+    --spot-available: 184 65% 45%;
     --spot-ev: 152 60% 48%;
     --spot-premium: 38 92% 55%;
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 220 20% 14%;
-    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary: 184 65% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 220 14% 96%;
     --sidebar-accent-foreground: 220 20% 14%;
     --sidebar-border: 220 14% 92%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-ring: 184 65% 45%;
   }
 
   .dark {
@@ -63,7 +64,7 @@
     --popover: 220 18% 12%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 217 91% 60%;
+    --primary: 184 65% 45%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 220 16% 16%;
@@ -80,23 +81,23 @@
 
     --border: 220 14% 20%;
     --input: 220 14% 20%;
-    --ring: 217 91% 60%;
+    --ring: 184 65% 45%;
 
     --success: 152 60% 48%;
     --warning: 38 92% 55%;
     --earning: 152 60% 48%;
-    --spot-available: 217 91% 60%;
+    --spot-available: 184 65% 45%;
     --spot-ev: 152 60% 48%;
     --spot-premium: 38 92% 55%;
 
     --sidebar-background: 220 18% 10%;
     --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary: 184 65% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 220 16% 16%;
     --sidebar-accent-foreground: 0 0% 95%;
     --sidebar-border: 220 14% 20%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-ring: 184 65% 45%;
   }
 }
 
@@ -111,7 +112,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-family: 'Neue Haas Grotesk Display Pro', system-ui, sans-serif;
   }
 }
 

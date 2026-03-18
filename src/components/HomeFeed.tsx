@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Search, X, Star, Zap, ChevronDown, ParkingCircle, Calendar, Music, Building2, Gift, MapPin, Dumbbell, GraduationCap, Landmark, ShoppingBag } from "lucide-react";
+import { Search, X, Star, Zap, ChevronDown, Calendar, Music, Building2, Gift, MapPin, Dumbbell, GraduationCap, Landmark, ShoppingBag } from "lucide-react";
 import { MOCK_SPOTS, type SpotMarker } from "./MapView";
 
 const FILTERS = [
@@ -139,7 +139,6 @@ export default function HomeFeed({ onBook, onNavigateToExplore }: HomeFeedProps)
                 onClick={() => onBook(spot)}
                 className="w-full mt-2 flex items-center justify-center gap-2 py-2.5 rounded-lg font-bold text-sm transition-colors bg-primary text-primary-foreground"
               >
-                <ParkingCircle className="w-4 h-4" />
                 Park now
               </button>
             </div>
