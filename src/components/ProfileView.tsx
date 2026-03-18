@@ -411,6 +411,7 @@ export default function ProfileView() {
 
   // Main profile
   const MENU_ITEMS = [
+    { label: "Earnings", icon: DollarSign, desc: "View your host earnings", color: "text-accent", screen: "earnings" as SubScreen },
     { label: "Settings", icon: Settings, desc: "Theme, language, preferences", color: "text-muted-foreground", screen: "settings" as SubScreen },
     { label: "Verification", icon: Shield, desc: "Identity verified", color: "text-accent", screen: "verification" as SubScreen },
     { label: "My Vehicles", icon: Car, desc: `${vehicles.length} vehicles added`, color: "text-primary", screen: "vehicles" as SubScreen },
