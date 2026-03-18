@@ -1,5 +1,4 @@
-import { MapPin, PlusCircle, BarChart3, User } from "lucide-react";
-import { motion } from "framer-motion";
+import { Home, Compass, PlusCircle, Bell, User } from "lucide-react";
 
 interface BottomNavProps {
   activeTab: string;
@@ -7,9 +6,10 @@ interface BottomNavProps {
 }
 
 const TABS = [
-  { id: "discover", label: "Explore", icon: MapPin },
-  { id: "list", label: "Host", icon: PlusCircle },
-  { id: "earnings", label: "Earnings", icon: BarChart3 },
+  { id: "home", label: "Home", icon: Home },
+  { id: "explore", label: "Explore", icon: Compass },
+  { id: "list", label: "Host", icon: PlusCircle, center: true },
+  { id: "activity", label: "Activity", icon: Bell },
   { id: "profile", label: "Account", icon: User },
 ];
 
@@ -20,6 +20,22 @@ export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
         {TABS.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
+
+          if (tab.center) {
+            return (
+              <button
+                key={tab.id}
+                onClick={() => onTabChange(tab.id)}
+                className="relative flex flex-col items-center gap-0.5 py-1 px-4 min-w-[60px]"
+              >
+                <div className="w-12 h-12 -mt-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg shadow-primary/30">
+                  <Icon className="w-6 h-6" />
+                </div>
+                <span className="text-[10px] font-medium text-muted-foreground">{tab.label}</span>
+              </button>
+            );
+          }
+
           return (
             <button
               key={tab.id}
