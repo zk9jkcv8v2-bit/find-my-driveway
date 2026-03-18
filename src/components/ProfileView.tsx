@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Star, Shield, Car, MapPin, ChevronRight, Bell, HelpCircle, LogOut, ArrowLeft, Check, Plus, Trash2, Settings, Moon, Sun, Globe, Palette } from "lucide-react";
+import { Star, Shield, Car, MapPin, ChevronRight, Bell, HelpCircle, LogOut, ArrowLeft, Check, Plus, Trash2, Settings, Moon, Sun, Globe, Palette, DollarSign } from "lucide-react";
+import EarningsDashboard from "@/components/EarningsDashboard";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 
