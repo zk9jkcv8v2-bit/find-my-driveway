@@ -115,7 +115,7 @@ export default function HomeFeed({ onBook, onNavigateToExplore }: HomeFeedProps)
               )}
               {/* Distance badge */}
               <span className="absolute top-3 left-3 text-[11px] font-bold px-2.5 py-1 rounded bg-accent text-accent-foreground">
-                📍 {spot.distance}
+                {spot.distance}
               </span>
             </button>
 
@@ -139,7 +139,7 @@ export default function HomeFeed({ onBook, onNavigateToExplore }: HomeFeedProps)
                 onClick={() => onBook(spot)}
                 className="w-full mt-2 flex items-center justify-center gap-2 py-2.5 rounded-lg font-bold text-sm transition-colors bg-primary text-primary-foreground"
               >
-                🚗
+                <ParkingCircle className="w-4 h-4" />
                 Park now
               </button>
             </div>
