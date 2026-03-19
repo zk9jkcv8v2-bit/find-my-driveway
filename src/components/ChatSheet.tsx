@@ -53,11 +53,25 @@ export default function ChatSheet({ spot, onClose }: ChatSheetProps) {
     setMessages(prev => [...prev, userMsg]);
     setInput("");
 
-    // Fake host reply
+    // Context-aware host reply
+    const userMessage = input.trim();
     setTimeout(() => {
+      const lowerMsg = userMessage.toLowerCase();
+      let replyText: string;
+      if (lowerMsg.includes("late") || lowerMsg.includes("running") || lowerMsg.includes("minutes")) {
+        replyText = "Okay thanks for letting me know! No worries, take your time 😊";
+      } else if (lowerMsg.includes("cancel")) {
+        replyText = "No problem, I'll free up the spot. Hope to see you next time!";
+      } else if (lowerMsg.includes("thanks") || lowerMsg.includes("thank you")) {
+        replyText = "You're welcome! See you soon 😊";
+      } else if (lowerMsg.includes("hello") || lowerMsg.includes("hi") || lowerMsg.includes("hey")) {
+        replyText = "Hey there! How can I help?";
+      } else {
+        replyText = HOST_REPLIES[Math.floor(Math.random() * HOST_REPLIES.length)];
+      }
       const reply: ChatMessage = {
         id: (Date.now() + 1).toString(),
-        text: HOST_REPLIES[Math.floor(Math.random() * HOST_REPLIES.length)],
+        text: replyText,
         sender: "host",
         time: "Now",
       };
