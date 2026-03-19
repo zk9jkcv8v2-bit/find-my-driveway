@@ -1,6 +1,5 @@
 import { CalendarCheck, MessageSquare, Clock, Car, ChevronRight } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const UPCOMING = [
   {
