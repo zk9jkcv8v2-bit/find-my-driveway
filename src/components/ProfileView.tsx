@@ -9,11 +9,11 @@ type SubScreen = "main" | "verification" | "vehicles" | "saved" | "notifications
 type ThemeMode = "light" | "dark" | "system";
 
 const SAVED_SPOTS = [
-  { id: "1", address: "742 Valencia St", type: "Driveway", price: 5 },
-  { id: "2", address: "180 Mission St", type: "Garage", price: 8 },
-  { id: "3", address: "55 3rd St", type: "Driveway", price: 3 },
-  { id: "4", address: "888 Brannan St", type: "Lot", price: 6 },
-  { id: "5", address: "123 Folsom St", type: "Driveway", price: 4 },
+  { id: "1", address: "742 Valencia St", type: "Driveway", price: 2.30 },
+  { id: "2", address: "180 Mission St", type: "Garage", price: 3.15 },
+  { id: "3", address: "55 3rd St", type: "Driveway", price: 1.75 },
+  { id: "4", address: "888 Brannan St", type: "Lot", price: 2.85 },
+  { id: "5", address: "123 Folsom St", type: "Driveway", price: 1.95 },
 ];
 
 const VEHICLES = [
