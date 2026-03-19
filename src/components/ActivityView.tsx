@@ -43,12 +43,12 @@ const PAST = [
   {
     title: "Residential Driveway",
     time: "Mar 15 · 10:00 AM – 1:00 PM",
-    price: "$9.00",
+    price: "$1.75",
   },
   {
     title: "Shopping Center Lot",
     time: "Mar 12 · 9:00 AM – 12:00 PM",
-    price: "$7.50",
+    price: "$2.30",
   },
 ];
 
