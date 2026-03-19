@@ -102,7 +102,6 @@ export default function ActivityView() {
               >
                 <div className="relative">
                   <img src={n.avatar} alt={n.name} className="w-10 h-10 rounded-full object-cover bg-secondary" />
-                </div>
                   {n.unread && (
                     <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-primary border-2 border-card" />
                   )}
