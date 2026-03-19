@@ -1,6 +1,5 @@
 import { CalendarCheck, MessageSquare, Clock, Car, ChevronRight } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const UPCOMING = [
   {
@@ -102,10 +101,7 @@ export default function ActivityView() {
                 className="flex items-center gap-3 p-3 rounded-xl hover:bg-secondary/50 transition-colors"
               >
                 <div className="relative">
-                  <Avatar className="w-10 h-10">
-                    <AvatarImage src={n.avatar} alt={n.name} />
-                    <AvatarFallback className="text-xs font-semibold">{n.initials}</AvatarFallback>
-                  </Avatar>
+                  <img src={n.avatar} alt={n.name} className="w-10 h-10 rounded-full object-cover bg-secondary" />
                   {n.unread && (
                     <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-primary border-2 border-card" />
                   )}
