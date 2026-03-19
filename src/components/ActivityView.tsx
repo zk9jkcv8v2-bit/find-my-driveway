@@ -6,7 +6,7 @@ const UPCOMING = [
     title: "Downtown Garage",
     address: "123 Main St, Spot B4",
     time: "Tomorrow · 2:00 – 5:00 PM",
-    price: "$12.00",
+    price: "$3.15",
     status: "Confirmed",
     statusColor: "bg-accent text-accent-foreground",
   },
@@ -14,7 +14,7 @@ const UPCOMING = [
     title: "Office Parking",
     address: "88 Commerce Blvd",
     time: "Today · Starts in 1 hour",
-    price: "$8.50",
+    price: "$2.50",
     status: "Upcoming",
     statusColor: "bg-primary text-primary-foreground",
   },
@@ -43,12 +43,12 @@ const PAST = [
   {
     title: "Residential Driveway",
     time: "Mar 15 · 10:00 AM – 1:00 PM",
-    price: "$9.00",
+    price: "$1.75",
   },
   {
     title: "Shopping Center Lot",
     time: "Mar 12 · 9:00 AM – 12:00 PM",
-    price: "$7.50",
+    price: "$2.30",
   },
 ];
 
