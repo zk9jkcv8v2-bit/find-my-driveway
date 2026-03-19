@@ -1,6 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { TrendingUp, Calendar, DollarSign, ArrowUpRight, ArrowLeft, Check, CreditCard, Clock, ChevronRight, Sparkles } from "lucide-react";
+import {
+  TrendingUp, Calendar, DollarSign, ArrowUpRight, ArrowLeft,
+  Check, CreditCard, Clock, ChevronRight, Sparkles, Flame, Star, Zap
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 
@@ -34,7 +37,7 @@ const PAST = [
 
 type SubScreen = "main" | "all-bookings" | "withdraw";
 
-/* ── Animated counter hook ── */
+/* ── Animated counter ── */
 function useCountUp(target: number, duration = 1200, delay = 0) {
   const [value, setValue] = useState(0);
   useEffect(() => {
@@ -43,7 +46,6 @@ function useCountUp(target: number, duration = 1200, delay = 0) {
       const tick = (now: number) => {
         const elapsed = now - start;
         const progress = Math.min(elapsed / duration, 1);
-        // ease-out cubic
         const eased = 1 - Math.pow(1 - progress, 3);
         setValue(Math.round(eased * target));
         if (progress < 1) requestAnimationFrame(tick);
@@ -55,52 +57,15 @@ function useCountUp(target: number, duration = 1200, delay = 0) {
   return value;
 }
 
-/* ── Progress Ring ── */
-function ProgressRing({ percent, size = 80, stroke = 6 }: { percent: number; size?: number; stroke?: number }) {
-  const radius = (size - stroke) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const [offset, setOffset] = useState(circumference);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setOffset(circumference - (percent / 100) * circumference);
-    }, 400);
-    return () => clearTimeout(timer);
-  }, [percent, circumference]);
-
-  return (
-    <div className="relative" style={{ width: size, height: size }}>
-      <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="hsl(var(--secondary))" strokeWidth={stroke} />
-        <circle
-          cx={size / 2} cy={size / 2} r={radius} fill="none"
-          stroke="url(#ringGradient)" strokeWidth={stroke}
-          strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={offset}
-          className="transition-all duration-1000 ease-out"
-        />
-        <defs>
-          <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="hsl(var(--primary))" />
-            <stop offset="100%" stopColor="hsl(var(--accent))" />
-          </linearGradient>
-        </defs>
-      </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="font-display font-extrabold text-sm text-foreground">{percent}%</span>
-      </div>
-    </div>
-  );
-}
-
 /* ── Confetti burst ── */
 function ConfettiBurst() {
-  const particles = Array.from({ length: 16 }, (_, i) => {
-    const angle = (i / 16) * 360;
-    const distance = 40 + Math.random() * 30;
+  const particles = Array.from({ length: 20 }, (_, i) => {
+    const angle = (i / 20) * 360;
+    const distance = 50 + Math.random() * 40;
     const x = Math.cos((angle * Math.PI) / 180) * distance;
     const y = Math.sin((angle * Math.PI) / 180) * distance;
-    const colors = ["hsl(var(--primary))", "hsl(var(--accent))", "hsl(var(--warning))", "hsl(var(--primary))"];
-    return { x, y, color: colors[i % colors.length], size: 4 + Math.random() * 4, delay: Math.random() * 0.15 };
+    const colors = ["hsl(var(--primary))", "hsl(var(--accent))", "hsl(var(--warning))", "#fff"];
+    return { x, y, color: colors[i % colors.length], size: 3 + Math.random() * 5, delay: Math.random() * 0.2 };
   });
 
   return (
@@ -111,56 +76,88 @@ function ConfettiBurst() {
           className="absolute rounded-full"
           style={{ width: p.size, height: p.size, backgroundColor: p.color, left: "50%", top: "50%", marginLeft: -p.size / 2, marginTop: -p.size / 2 }}
           initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
-          animate={{ x: p.x, y: p.y, opacity: 0, scale: 0.3 }}
-          transition={{ duration: 0.7, delay: p.delay, ease: "easeOut" }}
+          animate={{ x: p.x, y: p.y, opacity: 0, scale: 0 }}
+          transition={{ duration: 0.8, delay: p.delay, ease: "easeOut" }}
         />
       ))}
     </div>
   );
 }
 
-/* ── Bar chart tooltip ── */
-function ChartBar({ day, amount, maxAmount, index, period }: { day: string; amount: number; maxAmount: number; index: number; period: string }) {
-  const [showTooltip, setShowTooltip] = useState(false);
-  const barHeight = Math.round((amount / maxAmount) * 80);
+/* ── Animated bar ── */
+function ChartBar({ day, amount, maxAmount, index }: { day: string; amount: number; maxAmount: number; index: number }) {
+  const [touched, setTouched] = useState(false);
+  const barHeight = Math.round((amount / maxAmount) * 72);
   const isMax = amount === maxAmount;
 
   return (
-    <div className="flex-1 flex flex-col items-center gap-1.5 relative">
+    <div className="flex-1 flex flex-col items-center gap-1 relative">
       <AnimatePresence>
-        {showTooltip && (
+        {touched && (
           <motion.div
-            className="absolute -top-8 bg-foreground text-background text-[10px] font-bold px-2 py-0.5 rounded-md z-10 whitespace-nowrap"
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 4 }}
+            className="absolute -top-9 bg-foreground text-background text-[10px] font-bold px-2.5 py-1 rounded-lg z-10 whitespace-nowrap"
+            initial={{ opacity: 0, y: 6, scale: 0.8 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 6, scale: 0.8 }}
+            transition={{ type: "spring", stiffness: 500, damping: 30 }}
           >
             ${amount}
+            <div className="absolute left-1/2 -translate-x-1/2 -bottom-1 w-2 h-2 bg-foreground rotate-45" />
           </motion.div>
         )}
       </AnimatePresence>
       <div
         className="flex-1 w-full flex items-end cursor-pointer"
-        onMouseEnter={() => setShowTooltip(true)}
-        onMouseLeave={() => setShowTooltip(false)}
-        onTouchStart={() => setShowTooltip(true)}
-        onTouchEnd={() => setTimeout(() => setShowTooltip(false), 1200)}
+        onMouseEnter={() => setTouched(true)}
+        onMouseLeave={() => setTouched(false)}
+        onTouchStart={() => setTouched(true)}
+        onTouchEnd={() => setTimeout(() => setTouched(false), 1500)}
       >
         <motion.div
-          className="w-full rounded-lg relative overflow-hidden"
+          className="w-full rounded-lg overflow-hidden"
           style={{
             background: isMax
-              ? "linear-gradient(to top, hsl(var(--accent)), hsl(152 60% 58%))"
-              : "hsl(var(--accent))",
-            boxShadow: isMax ? "0 0 12px hsl(var(--accent) / 0.4)" : "none",
+              ? "linear-gradient(to top, hsl(var(--primary)), hsl(var(--accent)))"
+              : "hsl(var(--primary) / 0.2)",
           }}
           initial={{ height: 0 }}
           animate={{ height: barHeight }}
-          transition={{ delay: 0.1 + index * 0.04, type: "spring", stiffness: 300, damping: 25 }}
-        />
+          transition={{ delay: 0.15 + index * 0.06, type: "spring", stiffness: 200, damping: 20 }}
+          whileTap={{ scale: 0.92 }}
+        >
+          {isMax && (
+            <motion.div
+              className="w-full h-full"
+              style={{ background: "linear-gradient(to top, transparent, hsl(var(--primary-foreground) / 0.15))" }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0, 1, 0] }}
+              transition={{ delay: 1, duration: 2, repeat: Infinity, repeatDelay: 3 }}
+            />
+          )}
+        </motion.div>
       </div>
-      <span className="text-[9px] text-muted-foreground font-medium">{day}</span>
+      <span className={`text-[9px] font-semibold ${isMax ? "text-primary" : "text-muted-foreground"}`}>{day}</span>
     </div>
+  );
+}
+
+/* ── Streak badge ── */
+function StreakBadge() {
+  return (
+    <motion.div
+      className="flex items-center gap-1.5 bg-warning/10 text-warning px-3 py-1.5 rounded-full"
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ delay: 0.6, type: "spring" }}
+    >
+      <motion.div
+        animate={{ rotate: [0, -10, 10, 0] }}
+        transition={{ duration: 0.6, delay: 1, repeat: Infinity, repeatDelay: 4 }}
+      >
+        <Flame className="w-3.5 h-3.5" />
+      </motion.div>
+      <span className="text-[11px] font-bold">7-day streak!</span>
+    </motion.div>
   );
 }
 
@@ -196,6 +193,7 @@ export default function EarningsDashboard() {
     }, 1500);
   };
 
+  /* ── Withdraw sub-screen ── */
   if (subScreen === "withdraw") {
     return (
       <div className="h-screen bg-background pb-24 px-4 pt-14 overflow-y-auto">
@@ -205,17 +203,13 @@ export default function EarningsDashboard() {
 
         {withdrawn ? (
           <motion.div className="text-center py-20" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-            <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4 relative">
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 400, damping: 12, delay: 0.1 }}
-              >
-                <Check className="w-8 h-8 text-accent" />
+            <div className="w-20 h-20 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-5 relative">
+              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 400, damping: 12, delay: 0.1 }}>
+                <Check className="w-10 h-10 text-accent" />
               </motion.div>
               {showConfetti && <ConfettiBurst />}
             </div>
-            <h2 className="font-display font-bold text-xl text-foreground mb-1">Withdrawal Sent!</h2>
+            <h2 className="font-display font-bold text-2xl text-foreground mb-2">Withdrawal Sent!</h2>
             <p className="text-sm text-muted-foreground">$237.00 is on its way to your bank account.</p>
           </motion.div>
         ) : (
@@ -223,12 +217,12 @@ export default function EarningsDashboard() {
             <h1 className="font-display font-extrabold text-2xl text-foreground mb-1">Withdraw Earnings</h1>
             <p className="text-muted-foreground text-sm mb-8">Transfer your balance to your bank account</p>
 
-            <div className="soft-card p-5 mb-4">
-              <p className="text-xs text-muted-foreground mb-1">Available Balance</p>
-              <p className="font-display font-extrabold text-4xl text-foreground">${totalWeek}.00</p>
+            <div className="soft-card p-6 mb-4 text-center">
+              <p className="text-xs text-muted-foreground mb-2">Available Balance</p>
+              <p className="font-display font-extrabold text-5xl text-foreground">${totalWeek}<span className="text-2xl text-muted-foreground">.00</span></p>
             </div>
 
-            <div className="soft-card p-4 mb-6 flex items-center gap-3">
+            <div className="soft-card p-4 mb-4 flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center">
                 <CreditCard className="w-5 h-5 text-primary" />
               </div>
@@ -244,24 +238,10 @@ export default function EarningsDashboard() {
               <p className="text-sm text-muted-foreground">Arrives in 1–2 business days</p>
             </div>
 
-            <Button
-              variant="success"
-              size="xl"
-              className="w-full rounded-2xl font-display"
-              onClick={handleWithdraw}
-              disabled={withdrawing}
-            >
+            <Button variant="success" size="xl" className="w-full rounded-2xl font-display" onClick={handleWithdraw} disabled={withdrawing}>
               {withdrawing ? (
-                <motion.span
-                  className="flex items-center gap-2"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                >
-                  <motion.div
-                    className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
-                    animate={{ rotate: 360 }}
-                    transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }}
-                  />
+                <motion.span className="flex items-center gap-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  <motion.div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full" animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }} />
                   Processing...
                 </motion.span>
               ) : `Withdraw $${totalWeek}.00`}
@@ -272,6 +252,7 @@ export default function EarningsDashboard() {
     );
   }
 
+  /* ── All bookings sub-screen ── */
   if (subScreen === "all-bookings") {
     return (
       <div className="h-screen bg-background pb-24 px-4 pt-14 overflow-y-auto">
@@ -293,7 +274,6 @@ export default function EarningsDashboard() {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
-              whileHover={{ y: -2, boxShadow: "0 4px 16px rgba(0,0,0,0.08)" }}
             >
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0">
                 {booking.avatar}
@@ -337,136 +317,169 @@ export default function EarningsDashboard() {
     );
   }
 
+  /* ── Main dashboard ── */
   return (
-    <div className="h-screen bg-background pb-24 px-4 pt-14 overflow-y-auto">
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-display font-extrabold text-2xl text-foreground mb-0.5">Earnings</h1>
-        <p className="text-muted-foreground text-sm mb-6">Your parking income overview</p>
+    <div className="h-screen bg-background pb-24 px-4 pt-14 overflow-y-auto no-scrollbar">
+      {/* Header with streak */}
+      <motion.div
+        className="flex items-start justify-between mb-5"
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <div>
+          <h1 className="font-display font-extrabold text-2xl text-foreground mb-0.5">Earnings</h1>
+          <p className="text-muted-foreground text-sm">Your parking income</p>
+        </div>
+        <StreakBadge />
       </motion.div>
 
-      {/* Revenue card */}
+      {/* ── Hero earnings card ── */}
       <motion.div
-        className="soft-card p-5 mb-4 soft-shadow"
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
+        className="rounded-3xl p-5 mb-4 relative overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.85), hsl(var(--accent)))",
+        }}
+        initial={{ opacity: 0, y: 20, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ delay: 0.1, type: "spring", stiffness: 200, damping: 20 }}
       >
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex bg-secondary rounded-full p-0.5">
-            <button
-              onClick={() => setPeriod("week")}
-              className={`px-3 py-1 text-xs font-semibold rounded-full transition-all ${
-                period === "week" ? "bg-card text-foreground soft-shadow" : "text-muted-foreground"
-              }`}
-            >
-              Week
-            </button>
-            <button
-              onClick={() => setPeriod("month")}
-              className={`px-3 py-1 text-xs font-semibold rounded-full transition-all ${
-                period === "month" ? "bg-card text-foreground soft-shadow" : "text-muted-foreground"
-              }`}
-            >
-              Month
-            </button>
+        {/* Decorative circles */}
+        <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-primary-foreground/10" />
+        <div className="absolute -bottom-8 -left-8 w-24 h-24 rounded-full bg-primary-foreground/5" />
+
+        {/* Period toggle */}
+        <div className="flex items-center justify-between mb-4 relative z-10">
+          <div className="flex bg-primary-foreground/15 backdrop-blur-sm rounded-full p-0.5">
+            {(["week", "month"] as const).map((p) => (
+              <button
+                key={p}
+                onClick={() => setPeriod(p)}
+                className={`px-4 py-1.5 text-xs font-semibold rounded-full transition-all capitalize ${
+                  period === p
+                    ? "bg-primary-foreground text-primary shadow-sm"
+                    : "text-primary-foreground/70 hover:text-primary-foreground"
+                }`}
+              >
+                {p}
+              </button>
+            ))}
           </div>
           <motion.div
-            className="flex items-center gap-1 text-accent text-sm font-semibold bg-accent/10 px-2.5 py-1 rounded-full"
-            initial={{ scale: 1 }}
-            animate={{ scale: [1, 1.08, 1] }}
-            transition={{ duration: 1.5, delay: 0.8, ease: "easeInOut" }}
+            className="flex items-center gap-1 text-primary-foreground/90 text-xs font-semibold bg-primary-foreground/15 backdrop-blur-sm px-2.5 py-1 rounded-full"
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ duration: 2, delay: 1, repeat: Infinity, repeatDelay: 5 }}
           >
             <ArrowUpRight className="w-3.5 h-3.5" />
             +18%
           </motion.div>
         </div>
 
-        <p className="font-display font-extrabold text-4xl text-foreground mb-1 tabular-nums">
-          ${animatedTotal.toLocaleString()}
-        </p>
-        <p className="text-muted-foreground text-xs">
-          {period === "week" ? "This week" : "This month"} revenue
-        </p>
+        {/* Total */}
+        <div className="relative z-10 mb-1">
+          <p className="text-primary-foreground/60 text-xs font-medium mb-1">
+            {period === "week" ? "This Week" : "This Month"}
+          </p>
+          <div className="flex items-baseline gap-1">
+            <span className="text-primary-foreground/60 font-display text-2xl font-bold">$</span>
+            <motion.span
+              key={period}
+              className="font-display font-extrabold text-[42px] leading-none text-primary-foreground tabular-nums tracking-tight"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            >
+              {animatedTotal.toLocaleString()}
+            </motion.span>
+          </div>
+        </div>
 
-        {/* Chart inside gradient card */}
-        <div className="flex items-end gap-[6px] h-20 mt-4">
-          {earnings.map((day, i) => {
-            const barHeight = Math.round((day.amount / maxAmount) * 64);
-            const isMax = day.amount === maxAmount;
-            return (
-              <ChartBar key={`${period}-${day.day}`} day={day.day} amount={day.amount} maxAmount={maxAmount} index={i} period={period} />
-            );
-          })}
+        {/* Chart */}
+        <div className="flex items-end gap-[5px] h-[76px] mt-3 relative z-10">
+          {earnings.map((day, i) => (
+            <ChartBar key={`${period}-${day.day}`} day={day.day} amount={day.amount} maxAmount={maxAmount} index={i} />
+          ))}
         </div>
       </motion.div>
 
-      {/* Stats row */}
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <motion.div
-          className="soft-card p-4 cursor-pointer"
-          initial={{ opacity: 0, x: -8 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2 }}
-          whileTap={{ scale: 0.97 }}
-        >
-          <DollarSign className="w-5 h-5 text-accent mb-2" />
-          <p className="font-display font-extrabold text-xl text-foreground tabular-nums">${animatedMonth.toLocaleString()}</p>
-          <p className="text-xs text-muted-foreground">This month</p>
-        </motion.div>
-        <motion.div
-          className="soft-card p-4 cursor-pointer"
-          initial={{ opacity: 0, x: 8 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.25 }}
-          whileTap={{ scale: 0.97 }}
-        >
-          <Calendar className="w-5 h-5 text-primary mb-2" />
-          <p className="font-display font-extrabold text-xl text-foreground tabular-nums">{animatedBookings}</p>
-          <p className="text-xs text-muted-foreground">Bookings</p>
-        </motion.div>
+      {/* ── Stats row ── */}
+      <div className="grid grid-cols-3 gap-2.5 mb-4">
+        {[
+          { icon: DollarSign, value: `$${animatedMonth.toLocaleString()}`, label: "This month", color: "text-accent", bg: "bg-accent/10", delay: 0.2 },
+          { icon: Calendar, value: animatedBookings.toString(), label: "Bookings", color: "text-primary", bg: "bg-primary/10", delay: 0.25 },
+          { icon: Star, value: "4.9", label: "Rating", color: "text-warning", bg: "bg-warning/10", delay: 0.3 },
+        ].map((stat) => (
+          <motion.div
+            key={stat.label}
+            className="soft-card p-3.5 text-center"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: stat.delay }}
+            whileTap={{ scale: 0.96 }}
+          >
+            <div className={`w-8 h-8 rounded-xl ${stat.bg} flex items-center justify-center mx-auto mb-2`}>
+              <stat.icon className={`w-4 h-4 ${stat.color}`} />
+            </div>
+            <p className="font-display font-extrabold text-base text-foreground tabular-nums">{stat.value}</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">{stat.label}</p>
+          </motion.div>
+        ))}
       </div>
 
-      {/* Monthly goal progress */}
+      {/* ── Monthly goal ── */}
       <motion.div
-        className="soft-card p-4 mb-6 flex items-center gap-4"
+        className="soft-card p-4 mb-5"
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        whileTap={{ scale: 0.98 }}
+        transition={{ delay: 0.35 }}
       >
-        <ProgressRing percent={78} />
-        <div className="flex-1">
-          <div className="flex items-center gap-1.5 mb-0.5">
-            <Sparkles className="w-3.5 h-3.5 text-warning" />
-            <p className="font-display font-bold text-sm text-foreground">Monthly Goal</p>
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-xl bg-warning/10 flex items-center justify-center">
+              <Zap className="w-4 h-4 text-warning" />
+            </div>
+            <div>
+              <p className="font-display font-bold text-sm text-foreground">Monthly Goal</p>
+              <p className="text-[11px] text-muted-foreground">$558 left to go</p>
+            </div>
           </div>
-          <p className="text-xs text-muted-foreground mb-1">$1,842 of $2,400 target</p>
-          <div className="w-full h-1.5 bg-secondary rounded-full overflow-hidden">
+          <span className="font-display font-extrabold text-lg text-primary">78%</span>
+        </div>
+        <div className="w-full h-2.5 bg-secondary rounded-full overflow-hidden">
+          <motion.div
+            className="h-full rounded-full relative overflow-hidden"
+            style={{ background: "linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)))" }}
+            initial={{ width: 0 }}
+            animate={{ width: "78%" }}
+            transition={{ delay: 0.6, duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+          >
+            {/* shimmer */}
             <motion.div
-              className="h-full rounded-full"
-              style={{ background: "linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)))" }}
-              initial={{ width: 0 }}
-              animate={{ width: "78%" }}
-              transition={{ delay: 0.6, duration: 1, ease: "easeOut" }}
+              className="absolute inset-0"
+              style={{ background: "linear-gradient(90deg, transparent 0%, hsl(var(--primary-foreground) / 0.3) 50%, transparent 100%)" }}
+              animate={{ x: ["-100%", "200%"] }}
+              transition={{ duration: 2, delay: 1.8, repeat: Infinity, repeatDelay: 4, ease: "easeInOut" }}
             />
-          </div>
+          </motion.div>
+        </div>
+        <div className="flex justify-between mt-2">
+          <span className="text-[10px] text-muted-foreground">$1,842</span>
+          <span className="text-[10px] text-muted-foreground">$2,400</span>
         </div>
       </motion.div>
 
-      {/* Upcoming */}
+      {/* ── Upcoming bookings ── */}
       <div className="flex items-center justify-between mb-3">
-        <h2 className="font-display font-bold text-base text-foreground">Upcoming Bookings</h2>
+        <h2 className="font-display font-bold text-base text-foreground">Upcoming</h2>
         <button onClick={() => setSubScreen("all-bookings")} className="text-xs text-primary font-semibold">View all</button>
       </div>
-      <div className="space-y-2">
+      <div className="space-y-2 mb-5">
         {UPCOMING.slice(0, 2).map((booking, i) => (
           <motion.div
             key={booking.id}
             className="soft-card p-3.5 flex items-center gap-3"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35 + i * 0.05 }}
-            whileHover={{ y: -2, boxShadow: "0 4px 16px rgba(0,0,0,0.08)" }}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 + i * 0.06 }}
             whileTap={{ scale: 0.98 }}
           >
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0">
@@ -476,39 +489,45 @@ export default function EarningsDashboard() {
               <p className="font-semibold text-sm text-foreground">{booking.driver}</p>
               <p className="text-xs text-muted-foreground">{booking.time} · {booking.duration}</p>
             </div>
-            <span className="font-display font-bold text-accent">${booking.amount}</span>
+            <div className="text-right">
+              <span className="font-display font-bold text-accent">${booking.amount}</span>
+              <p className={`text-[10px] font-medium ${booking.status === "pending" ? "text-warning" : "text-accent"}`}>
+                {booking.status === "pending" ? "Pending" : "Confirmed"}
+              </p>
+            </div>
           </motion.div>
         ))}
       </div>
 
-      {/* Withdraw */}
-      <motion.div className="mt-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
+      {/* ── Withdraw CTA ── */}
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
         <Button
           variant="success"
           size="xl"
-          className="w-full rounded-2xl font-display"
+          className="w-full rounded-2xl font-display relative overflow-hidden group"
           onClick={() => setSubScreen("withdraw")}
         >
-          Withdraw ${totalWeek}.00
+          <motion.div
+            className="absolute inset-0 bg-primary-foreground/10"
+            initial={{ x: "-100%" }}
+            whileHover={{ x: "100%" }}
+            transition={{ duration: 0.6 }}
+          />
+          <span className="relative z-10 flex items-center gap-2">
+            Withdraw ${totalWeek}.00
+            <ArrowUpRight className="w-4 h-4 transition-transform group-active:translate-x-0.5 group-active:-translate-y-0.5" />
+          </span>
         </Button>
       </motion.div>
 
-      {/* Payment Method Card */}
-      <motion.div
-        className="mt-6 mb-2"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.55 }}
-      >
+      {/* ── Payment card ── */}
+      <motion.div className="mt-6 mb-2" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}>
         <h2 className="font-display font-bold text-base text-foreground mb-3">Payment Method</h2>
         <motion.div
           className="rounded-2xl p-5 relative overflow-hidden"
-          style={{
-            background: "linear-gradient(135deg, hsl(var(--foreground)), hsl(var(--foreground) / 0.8))",
-          }}
+          style={{ background: "linear-gradient(135deg, hsl(var(--foreground)), hsl(var(--foreground) / 0.75))" }}
           whileTap={{ scale: 0.98 }}
         >
-          {/* Card chip & contactless */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex gap-1.5">
               <div className="w-8 h-6 rounded-sm bg-warning/80" />
@@ -518,13 +537,7 @@ export default function EarningsDashboard() {
             </div>
             <span className="text-background/60 text-xs font-semibold tracking-wider uppercase">Visa</span>
           </div>
-
-          {/* Card number */}
-          <p className="text-background font-mono text-base tracking-[0.2em] mb-4">
-            •••• •••• •••• 4829
-          </p>
-
-          {/* Card details row */}
+          <p className="text-background font-mono text-base tracking-[0.2em] mb-4">•••• •••• •••• 4829</p>
           <div className="flex items-end justify-between">
             <div>
               <p className="text-background/50 text-[9px] uppercase tracking-wider mb-0.5">Card Holder</p>
@@ -534,13 +547,7 @@ export default function EarningsDashboard() {
               <p className="text-background/50 text-[9px] uppercase tracking-wider mb-0.5">Expires</p>
               <p className="text-background text-xs font-semibold">09/28</p>
             </div>
-            <div>
-              <p className="text-background/50 text-[9px] uppercase tracking-wider mb-0.5">Balance</p>
-              <p className="text-background text-xs font-bold font-display">${animatedTotal > 0 ? animatedTotal.toLocaleString() : displayTotal.toLocaleString()}.00</p>
-            </div>
           </div>
-
-          {/* Subtle pattern overlay */}
           <div className="absolute inset-0 pointer-events-none opacity-[0.04]"
             style={{
               backgroundImage: "radial-gradient(circle at 20% 80%, hsl(var(--background)) 1px, transparent 1px), radial-gradient(circle at 80% 20%, hsl(var(--background)) 1px, transparent 1px)",
@@ -549,7 +556,6 @@ export default function EarningsDashboard() {
           />
         </motion.div>
 
-        {/* Quick actions under card */}
         <div className="grid grid-cols-3 gap-2 mt-3">
           {[
             { icon: <CreditCard className="w-4 h-4" />, label: "Change Card" },
@@ -562,7 +568,7 @@ export default function EarningsDashboard() {
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 + i * 0.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileTap={{ scale: 0.93 }}
             >
               {action.icon}
               <span className="text-[10px] font-medium">{action.label}</span>
