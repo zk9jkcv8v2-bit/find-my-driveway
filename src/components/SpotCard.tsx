@@ -34,7 +34,7 @@ export default function SpotCard({ spot, onBook, onNavigate, onChat, compact = f
         <p className="text-sm font-semibold text-foreground truncate">{spot.address}</p>
         <p className="text-xs text-muted-foreground mb-2">{spot.distance} · {typeLabel}</p>
         <div className="flex items-center gap-1.5">
-          <span className="font-display font-bold text-primary text-lg">${spot.price}</span>
+          <span className="font-display font-bold text-primary text-lg">${spot.price.toFixed(2)}</span>
           <span className="text-xs text-muted-foreground">/hr</span>
           {spot.hasEV && <Zap className="w-3.5 h-3.5 text-accent ml-auto" />}
         </div>
