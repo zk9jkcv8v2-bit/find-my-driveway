@@ -71,16 +71,24 @@ const OREBRO_CENTER: [number, number] = [59.2753, 15.2134];
 
 function createPriceIcon(price: number, isSelected: boolean, hasEV: boolean) {
   const bg = isSelected
-    ? "hsl(217, 91%, 60%)"
+    ? "linear-gradient(135deg, hsl(217, 91%, 55%), hsl(217, 91%, 45%))"
     : hasEV
-      ? "hsl(152, 60%, 48%)"
-      : "#ffffff";
+      ? "linear-gradient(135deg, hsl(152, 60%, 45%), hsl(152, 60%, 38%))"
+      : "linear-gradient(135deg, hsl(0, 0%, 100%), hsl(220, 14%, 96%))";
+  const flatBg = isSelected
+    ? "hsl(217, 91%, 50%)"
+    : hasEV
+      ? "hsl(152, 60%, 42%)"
+      : "hsl(220, 14%, 96%)";
   const color = isSelected || hasEV ? "#ffffff" : "hsl(220, 20%, 14%)";
   const shadow = isSelected
-    ? "0 4px 14px rgba(59, 130, 246, 0.4)"
-    : "0 2px 8px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.06)";
-  const border = isSelected || hasEV ? "none" : "1.5px solid hsl(220, 14%, 90%)";
-  const size = isSelected ? "transform: scale(1.1);" : "";
+    ? "0 6px 20px rgba(59, 130, 246, 0.45), 0 2px 6px rgba(59, 130, 246, 0.2)"
+    : hasEV
+      ? "0 4px 14px rgba(34, 197, 94, 0.3), 0 2px 4px rgba(34, 197, 94, 0.1)"
+      : "0 3px 12px rgba(0, 0, 0, 0.1), 0 1px 4px rgba(0, 0, 0, 0.06)";
+  const border = isSelected || hasEV ? "none" : "1.5px solid hsl(220, 14%, 88%)";
+  const scale = isSelected ? "transform: scale(1.15);" : "";
+  const fontSize = isSelected ? "14px" : "12.5px";
 
   const html = `
     <div style="
@@ -91,27 +99,29 @@ function createPriceIcon(price: number, isSelected: boolean, hasEV: boolean) {
       color: ${color};
       border: ${border};
       box-shadow: ${shadow};
-      padding: 5px 10px;
-      border-radius: 20px;
-      font-weight: 700;
-      font-size: 13px;
+      padding: 6px 12px;
+      border-radius: 22px;
+      font-weight: 800;
+      font-size: ${fontSize};
       font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       white-space: nowrap;
-      ${size}
+      ${scale}
       position: relative;
       cursor: pointer;
       line-height: 1;
+      letter-spacing: -0.02em;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     ">
-      ${hasEV ? '<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:3px"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>' : ''}
-      $${price}
+      ${hasEV ? '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="margin-right:3px;opacity:0.9"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>' : ''}
+      $${price.toFixed(2)}
       <div style="
         position: absolute;
-        bottom: -4px;
+        bottom: -5px;
         left: 50%;
         transform: translateX(-50%) rotate(45deg);
-        width: 8px;
-        height: 8px;
-        background: ${bg};
+        width: 9px;
+        height: 9px;
+        background: ${flatBg};
         ${!isSelected && !hasEV ? `border-right: ${border}; border-bottom: ${border};` : ""}
       "></div>
     </div>
@@ -120,8 +130,8 @@ function createPriceIcon(price: number, isSelected: boolean, hasEV: boolean) {
   return L.divIcon({
     className: "",
     html,
-    iconSize: [60, 36],
-    iconAnchor: [30, 36],
+    iconSize: [70, 40],
+    iconAnchor: [35, 40],
   });
 }
 

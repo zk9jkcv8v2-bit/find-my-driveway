@@ -123,7 +123,7 @@ export default function BookingSheet({ spot, onClose, onNavigate }: BookingSheet
               </div>
 
               <Button variant="cta" size="xl" className="w-full rounded-2xl" onClick={() => setConfirmed(true)}>
-                Confirm Booking · ${grandTotal.toFixed(2)}
+                Confirm Parking · ${grandTotal.toFixed(2)}
               </Button>
             </>
           ) : (

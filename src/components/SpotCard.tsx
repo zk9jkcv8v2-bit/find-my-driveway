@@ -126,7 +126,7 @@ export default function SpotCard({ spot, onBook, onNavigate, onChat, compact = f
                 className="rounded-full h-9 px-4"
                 onClick={() => onBook(spot)}
               >
-                Book
+                Park
               </Button>
             </div>
           </div>
