@@ -98,7 +98,7 @@ export default function SpotCard({ spot, onBook, onNavigate, onChat, compact = f
           {/* Price + actions */}
           <div className="flex items-center justify-between">
             <div className="flex items-baseline gap-0.5">
-              <span className="font-display font-extrabold text-xl text-foreground">${spot.price}</span>
+              <span className="font-display font-extrabold text-xl text-foreground">${spot.price.toFixed(2)}</span>
               <span className="text-xs text-muted-foreground">/hr</span>
             </div>
             <div className="flex gap-2">
