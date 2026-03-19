@@ -112,7 +112,7 @@ function createPriceIcon(price: number, isSelected: boolean, hasEV: boolean) {
       letter-spacing: -0.02em;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     ">
-      ${hasEV ? '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="margin-right:3px;opacity:0.9"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>' : ''}
+      ${hasEV ? '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="margin-right:4px;filter:drop-shadow(0 0 3px rgba(255,255,255,0.6))"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>' : ''}
       $${price.toFixed(2)}
       <div style="
         position: absolute;
