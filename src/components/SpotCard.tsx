@@ -125,7 +125,7 @@ export default function SpotCard({ spot, onBook, onNavigate, onChat, compact = f
               <Button
                 variant="cta"
                 size="sm"
-                className="rounded-full h-9 px-4"
+                className="rounded-xl h-9 px-4"
                 onClick={() => onBook(spot)}
               >
                 Park

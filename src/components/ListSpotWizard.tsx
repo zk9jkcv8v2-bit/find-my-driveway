@@ -151,7 +151,7 @@ export default function ListSpotWizard() {
                       <>
                         <img src={photos[0]} alt="Spot" className="w-full h-full object-cover absolute inset-0" />
                         <button
-                          className="absolute top-2 right-2 w-7 h-7 rounded-full bg-foreground/60 flex items-center justify-center z-10"
+                          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-foreground/60 flex items-center justify-center z-10"
                           onClick={(e) => { e.stopPropagation(); removePhoto(0); }}
                         >
                           <X className="w-4 h-4 text-primary-foreground" />

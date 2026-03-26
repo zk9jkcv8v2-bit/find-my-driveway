@@ -103,7 +103,7 @@ function createPriceIcon(price: number, isSelected: boolean, hasEV: boolean) {
       border-radius: 22px;
       font-weight: 800;
       font-size: ${fontSize};
-      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      font-family: 'Neue Haas Grotesk Display Pro', 'Inter', system-ui, sans-serif;
       white-space: nowrap;
       ${scale}
       position: relative;

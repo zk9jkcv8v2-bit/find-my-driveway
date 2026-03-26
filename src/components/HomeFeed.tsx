@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Search, X, Star, Zap, ChevronDown, Calendar, Music, Building2, Gift, MapPin, Dumbbell, GraduationCap, Landmark, ShoppingBag } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { MOCK_SPOTS, type SpotMarker } from "./MapView";
 
 const FILTERS = [
@@ -53,7 +54,7 @@ export default function HomeFeed({ onBook, onNavigateToExplore }: HomeFeedProps)
 
       {/* Search */}
       <div className="px-4 mb-4">
-        <div className="flex items-center gap-3 bg-card rounded-lg px-3 py-3 border border-border">
+        <div className="flex items-center gap-3 bg-secondary rounded-xl px-3 py-3 border border-border">
           <Search className="w-4 h-4 text-muted-foreground shrink-0" />
           <input
             type="text"
@@ -116,7 +117,7 @@ export default function HomeFeed({ onBook, onNavigateToExplore }: HomeFeedProps)
                 </div>
               )}
               {/* Distance badge */}
-              <span className="absolute top-3 left-3 text-[11px] font-bold px-2.5 py-1 rounded bg-accent text-accent-foreground">
+              <span className="absolute top-3 left-3 text-[11px] font-bold px-2.5 py-1 rounded-lg bg-accent text-accent-foreground">
                 {spot.distance}
               </span>
             </button>
@@ -137,13 +138,11 @@ export default function HomeFeed({ onBook, onNavigateToExplore }: HomeFeedProps)
                 </div>
               </div>
 
-              <motion.button
-                onClick={() => onBook(spot)}
-                className="w-full mt-3 flex items-center justify-center gap-2 py-3 rounded-lg font-bold text-sm transition-colors bg-primary text-primary-foreground"
-                whileTap={{ scale: 0.97 }}
-              >
-                Park now
-              </motion.button>
+              <motion.div whileTap={{ scale: 0.97 }} className="mt-3">
+                <Button variant="cta" className="w-full" onClick={() => onBook(spot)}>
+                  Park now
+                </Button>
+              </motion.div>
             </div>
           </motion.div>
         ))}

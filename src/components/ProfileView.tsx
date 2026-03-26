@@ -246,7 +246,7 @@ export default function ProfileView() {
                   item.value ? "bg-primary justify-end" : "bg-border justify-start"
                 }`}
               >
-                <div className="w-5 h-5 rounded-full bg-white soft-shadow transition-transform" />
+                <div className="w-5 h-5 rounded-full bg-card soft-shadow transition-transform" />
               </button>
             </motion.div>
           ))}

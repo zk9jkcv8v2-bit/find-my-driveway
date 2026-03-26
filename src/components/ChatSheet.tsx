@@ -157,7 +157,7 @@ export default function ChatSheet({ spot, onClose }: ChatSheetProps) {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                className="flex-1 bg-secondary rounded-full px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/30"
+                className="flex-1 bg-secondary rounded-xl border border-border px-3 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/30"
               />
               <Button
                 variant="cta"
