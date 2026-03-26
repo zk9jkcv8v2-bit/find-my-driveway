@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Clock, Calendar, Zap, Check, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { SpotMarker } from "./MapView";
+import type { SpotMarker } from "./spots-data";
 import { useState } from "react";
 
 interface BookingSheetProps {

@@ -1,6 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, lazy, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import MapView, { MOCK_SPOTS, type SpotMarker } from "@/components/MapView";
+import { MOCK_SPOTS, type SpotMarker } from "@/components/spots-data";
+const LazyMapView = lazy(() => import("@/components/MapView"));
 import FilterBar from "@/components/FilterBar";
 import SpotCard from "@/components/SpotCard";
 import BookingSheet from "@/components/BookingSheet";
@@ -110,14 +111,23 @@ export default function Index() {
 
             {/* Map */}
             <div className="flex-1">
-              <MapView
-                onSpotSelect={(spot) => {
-                  setSelectedSpot(spot);
-                  setSheetExpanded(true);
-                }}
-                selectedSpot={selectedSpot}
-                spots={filteredSpots}
-              />
+              <Suspense fallback={
+                <div className="flex-1 h-full flex items-center justify-center bg-secondary">
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="w-6 h-6 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                    <span className="text-xs text-muted-foreground">Loading map...</span>
+                  </div>
+                </div>
+              }>
+                <LazyMapView
+                  onSpotSelect={(spot) => {
+                    setSelectedSpot(spot);
+                    setSheetExpanded(true);
+                  }}
+                  selectedSpot={selectedSpot}
+                  spots={filteredSpots}
+                />
+              </Suspense>
             </div>
 
             {/* Bottom sheet */}

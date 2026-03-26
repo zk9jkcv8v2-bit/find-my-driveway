@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { SpotMarker } from "./MapView";
+import type { SpotMarker } from "./spots-data";
 
 interface ChatSheetProps {
   spot: SpotMarker | null;

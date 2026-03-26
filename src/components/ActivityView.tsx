@@ -1,6 +1,8 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { CalendarCheck, MessageSquare, Clock, Car, ChevronRight } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const UPCOMING = [
   {
@@ -53,7 +55,70 @@ const PAST = [
   },
 ];
 
+function ActivitySkeleton() {
+  return (
+    <div className="px-4 pt-14 pb-24 space-y-8">
+      {/* Upcoming skeleton */}
+      <div>
+        <Skeleton className="h-3 w-20 mb-3" />
+        <div className="space-y-3">
+          {[1, 2].map((i) => (
+            <Skeleton key={i} className="h-24 w-full rounded-2xl" />
+          ))}
+        </div>
+      </div>
+      <div className="h-px bg-border" />
+      {/* Messages skeleton */}
+      <div>
+        <Skeleton className="h-3 w-20 mb-3" />
+        <div className="space-y-2">
+          {[1, 2].map((i) => (
+            <div key={i} className="flex items-center gap-3 p-3">
+              <Skeleton className="w-10 h-10 rounded-full shrink-0" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-3 w-48" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="h-px bg-border" />
+      {/* Past skeleton */}
+      <div>
+        <Skeleton className="h-3 w-24 mb-3" />
+        <div className="space-y-2">
+          {[1, 2].map((i) => (
+            <div key={i} className="flex items-center gap-3 p-3">
+              <Skeleton className="w-9 h-9 rounded-full shrink-0" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-3 w-40" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ActivityView() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 800);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return (
+      <ScrollArea className="h-full">
+        <ActivitySkeleton />
+      </ScrollArea>
+    );
+  }
+
   return (
     <ScrollArea className="h-full">
       <div className="px-4 pt-14 pb-24 space-y-8">
