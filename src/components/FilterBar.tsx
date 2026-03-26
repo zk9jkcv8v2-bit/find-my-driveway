@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { ArrowDownUp, DollarSign, Zap, MapPin } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 const FILTERS = [
   { label: "Nearest", icon: MapPin },
@@ -26,16 +25,21 @@ export default function FilterBar({ activeFilter, onFilterChange }: FilterBarPro
         const isActive = activeFilter === filter.label;
         const Icon = filter.icon;
         return (
-          <Button
+          <motion.button
             key={filter.label}
-            variant={isActive ? "default" : "outline"}
-            size="sm"
             onClick={() => onFilterChange(isActive ? null : filter.label)}
-            className="shrink-0 gap-1.5 rounded-full h-8 px-3"
+            className={`shrink-0 gap-1.5 rounded-full h-8 px-3 text-sm font-medium inline-flex items-center border transition-colors ${
+              isActive
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-card text-foreground border-border hover:bg-secondary"
+            }`}
+            whileTap={{ scale: 0.92 }}
+            layout
+            transition={{ type: "spring", stiffness: 500, damping: 30 }}
           >
             <Icon className="w-3.5 h-3.5" />
             {filter.label}
-          </Button>
+          </motion.button>
         );
       })}
     </motion.div>

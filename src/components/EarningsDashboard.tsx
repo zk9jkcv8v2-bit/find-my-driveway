@@ -401,7 +401,7 @@ export default function EarningsDashboard() {
       </motion.div>
 
       {/* Stats row */}
-      <div className="grid grid-cols-2 gap-3 mb-4">
+      <div className="grid grid-cols-2 gap-4 mb-4">
         <motion.div
           className="soft-card p-4 cursor-pointer"
           initial={{ opacity: 0, x: -8 }}
@@ -550,7 +550,7 @@ export default function EarningsDashboard() {
         </motion.div>
 
         {/* Quick actions under card */}
-        <div className="grid grid-cols-3 gap-2 mt-3">
+        <div className="grid grid-cols-3 gap-3 mt-3">
           {[
             { icon: <CreditCard className="w-4 h-4" />, label: "Change Card" },
             { icon: <Clock className="w-4 h-4" />, label: "History" },
