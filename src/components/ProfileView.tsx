@@ -65,16 +65,16 @@ export default function ProfileView() {
 
   if (subScreen === "earnings") {
     return (
-      <div className="min-h-screen bg-background pb-24 px-4 pt-14">
+      <motion.div className="min-h-screen bg-background pb-24 px-4 pt-14" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.2 }}>
         <BackButton />
         <EarningsDashboard />
-      </div>
+      </motion.div>
     );
   }
 
   if (subScreen === "verification") {
     return (
-      <div className="min-h-screen bg-background pb-24 px-4 pt-14">
+      <motion.div className="min-h-screen bg-background pb-24 px-4 pt-14" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.2 }}>
         <BackButton />
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="font-display font-extrabold text-2xl text-foreground mb-1">Verification</h1>
@@ -106,13 +106,13 @@ export default function ProfileView() {
             </motion.div>
           ))}
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   if (subScreen === "vehicles") {
     return (
-      <div className="min-h-screen bg-background pb-24 px-4 pt-14">
+      <motion.div className="min-h-screen bg-background pb-24 px-4 pt-14" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.2 }}>
         <BackButton />
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="font-display font-extrabold text-2xl text-foreground mb-1">My Vehicles</h1>
@@ -163,13 +163,13 @@ export default function ProfileView() {
         >
           <Plus className="w-4 h-4" /> Add Vehicle
         </Button>
-      </div>
+      </motion.div>
     );
   }
 
   if (subScreen === "saved") {
     return (
-      <div className="min-h-screen bg-background pb-24 px-4 pt-14">
+      <motion.div className="min-h-screen bg-background pb-24 px-4 pt-14" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.2 }}>
         <BackButton />
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="font-display font-extrabold text-2xl text-foreground mb-1">Saved Spots</h1>
@@ -210,13 +210,13 @@ export default function ProfileView() {
             </div>
           )}
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   if (subScreen === "notifications") {
     return (
-      <div className="min-h-screen bg-background pb-24 px-4 pt-14">
+      <motion.div className="min-h-screen bg-background pb-24 px-4 pt-14" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.2 }}>
         <BackButton />
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="font-display font-extrabold text-2xl text-foreground mb-1">Notifications</h1>
@@ -251,13 +251,13 @@ export default function ProfileView() {
             </motion.div>
           ))}
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   if (subScreen === "help") {
     return (
-      <div className="min-h-screen bg-background pb-24 px-4 pt-14">
+      <motion.div className="min-h-screen bg-background pb-24 px-4 pt-14" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.2 }}>
         <BackButton />
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="font-display font-extrabold text-2xl text-foreground mb-1">Help & Support</h1>
@@ -306,7 +306,7 @@ export default function ProfileView() {
         >
           Contact Support
         </Button>
-      </div>
+      </motion.div>
     );
   }
 
@@ -320,7 +320,7 @@ export default function ProfileView() {
     const LANGUAGES = ["English", "Svenska", "Deutsch", "Español"];
 
     return (
-      <div className="min-h-screen bg-background pb-24 px-4 pt-14">
+      <motion.div className="min-h-screen bg-background pb-24 px-4 pt-14" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.2 }}>
         <BackButton />
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="font-display font-extrabold text-2xl text-foreground mb-1">Settings</h1>
@@ -405,7 +405,7 @@ export default function ProfileView() {
             ))}
           </div>
         </motion.div>
-      </div>
+      </motion.div>
     );
   }
 
@@ -439,40 +439,45 @@ export default function ProfileView() {
 
       {/* Stats */}
       <motion.div
-        className="grid grid-cols-3 gap-3 mb-6"
+        className="grid grid-cols-3 gap-4 mb-6"
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
       >
-        <div className="soft-card p-3 text-center">
-          <p className="font-display font-extrabold text-lg text-foreground">47</p>
-          <p className="text-[10px] text-muted-foreground">Bookings</p>
+        <div className="soft-card p-4 text-center">
+          <p className="font-display font-extrabold text-xl text-foreground">47</p>
+          <p className="text-xs text-muted-foreground">Bookings</p>
         </div>
-        <div className="soft-card p-3 text-center">
+        <div className="soft-card p-4 text-center">
           <div className="flex items-center justify-center gap-0.5">
             <Star className="w-3.5 h-3.5 text-warning fill-warning" />
-            <p className="font-display font-extrabold text-lg text-foreground">4.9</p>
+            <p className="font-display font-extrabold text-xl text-foreground">4.9</p>
           </div>
-          <p className="text-[10px] text-muted-foreground">Rating</p>
+          <p className="text-xs text-muted-foreground">Rating</p>
         </div>
-        <div className="soft-card p-3 text-center">
-          <p className="font-display font-extrabold text-lg text-accent">✓</p>
-          <p className="text-[10px] text-muted-foreground">Verified</p>
+        <div className="soft-card p-4 text-center">
+          <p className="font-display font-extrabold text-xl text-accent">✓</p>
+          <p className="text-xs text-muted-foreground">Verified</p>
         </div>
       </motion.div>
 
       {/* Menu */}
-      <div className="space-y-1.5">
+      <motion.div
+        className="soft-card overflow-hidden"
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+      >
         {MENU_ITEMS.map((item, i) => {
           const Icon = item.icon;
           return (
             <motion.button
               key={item.label}
-              className="soft-card p-4 w-full flex items-center gap-3 hover:bg-secondary/50 transition-colors"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 + i * 0.04 }}
+              className={`p-4 w-full flex items-center gap-3 hover:bg-secondary/50 transition-colors ${
+                i < MENU_ITEMS.length - 1 ? "border-b border-border" : ""
+              }`}
               onClick={() => setSubScreen(item.screen)}
+              whileTap={{ scale: 0.98 }}
             >
               <div className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center">
                 <Icon className={`w-[18px] h-[18px] ${item.color}`} />
@@ -485,7 +490,7 @@ export default function ProfileView() {
             </motion.button>
           );
         })}
-      </div>
+      </motion.div>
 
       {/* Sign out */}
       <motion.button

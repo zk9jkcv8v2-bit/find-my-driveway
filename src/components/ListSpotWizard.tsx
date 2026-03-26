@@ -117,7 +117,7 @@ export default function ListSpotWizard() {
         {STEPS.map((s, i) => (
           <div key={s} className="flex-1">
             <div className={`h-1.5 rounded-full transition-all duration-500 ${i <= step ? "bg-primary" : "bg-border"}`} />
-            <p className={`text-[10px] mt-1.5 font-medium ${i <= step ? "text-primary" : "text-muted-foreground"}`}>{s}</p>
+            <p className={`text-xs mt-1.5 font-medium ${i <= step ? "text-primary" : "text-muted-foreground"}`}>{s}</p>
           </div>
         ))}
       </div>
@@ -132,7 +132,7 @@ export default function ListSpotWizard() {
             <p className="text-muted-foreground text-sm max-w-[240px] mx-auto">Your parking spot is now visible to drivers nearby.</p>
           </motion.div>
         ) : (
-          <motion.div key={step} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
+          <motion.div key={step} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.25 }}>
 
             {/* STEP 0: Photos */}
             {step === 0 && (

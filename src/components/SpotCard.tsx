@@ -18,8 +18,9 @@ export default function SpotCard({ spot, onBook, onNavigate, onChat, compact = f
   if (compact) {
     return (
       <motion.button
-        className="soft-card p-3 w-[180px] shrink-0 text-left"
+        className="soft-card p-3 w-[200px] shrink-0 text-left"
         whileTap={{ scale: 0.97 }}
+        whileHover={{ y: -3, boxShadow: "0 6px 20px rgba(0,0,0,0.08)" }}
         onClick={() => onBook(spot)}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -48,14 +49,15 @@ export default function SpotCard({ spot, onBook, onNavigate, onChat, compact = f
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
+      whileTap={{ scale: 0.98 }}
       layout
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-4">
         {/* Spot image */}
         {spot.image ? (
-          <img src={spot.image} alt={spot.address} className="w-20 h-20 rounded-xl object-cover shrink-0" />
+          <img src={spot.image} alt={spot.address} className="w-24 h-24 rounded-xl object-cover shrink-0" />
         ) : (
-          <div className="w-20 h-20 rounded-xl bg-secondary flex items-center justify-center text-2xl shrink-0">
+          <div className="w-24 h-24 rounded-xl bg-secondary flex items-center justify-center text-2xl shrink-0">
             {typeEmoji}
           </div>
         )}
@@ -79,7 +81,7 @@ export default function SpotCard({ spot, onBook, onNavigate, onChat, compact = f
           </div>
 
           {/* Tags */}
-          <div className="flex gap-1.5 mb-3 flex-wrap">
+          <div className="flex gap-1.5 mb-4 flex-wrap">
             {spot.hasEV && (
               <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent/10 text-accent text-[10px] font-medium">
                 <Zap className="w-2.5 h-2.5" /> EV

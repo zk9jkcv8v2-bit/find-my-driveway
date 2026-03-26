@@ -66,47 +66,59 @@ export default function BookingSheet({ spot, onClose, onNavigate }: BookingSheet
 
           {!confirmed ? (
             <>
-              <div className="mb-5">
+              <div className="mb-6">
                 <h2 className="font-display font-bold text-lg text-foreground">Book Parking</h2>
                 <p className="text-sm text-muted-foreground">{spot.address}</p>
               </div>
 
-              <div className="grid grid-cols-3 gap-2 mb-5">
+              <div className="grid grid-cols-3 gap-3 mb-5">
                 {TIME_OPTIONS.map((opt, i) => {
                   const Icon = opt.icon;
                   return (
-                    <button
+                    <motion.button
                       key={opt.label}
                       onClick={() => setSelectedTime(i)}
-                      className={`flex flex-col items-center gap-1 p-3 rounded-2xl border-2 transition-all ${
+                      className={`flex flex-col items-center gap-1 p-4 rounded-2xl border-2 transition-all ${
                         selectedTime === i
                           ? "border-primary bg-primary/5"
                           : "border-border hover:border-primary/30"
                       }`}
+                      whileTap={{ scale: 0.95 }}
                     >
                       <Icon className={`w-5 h-5 ${selectedTime === i ? "text-primary" : "text-muted-foreground"}`} />
                       <span className={`text-xs font-semibold ${selectedTime === i ? "text-primary" : "text-foreground"}`}>{opt.label}</span>
-                    </button>
+                    </motion.button>
                   );
                 })}
               </div>
 
-              <div className="flex items-center justify-between bg-secondary rounded-2xl p-4 mb-5">
+              <div className="flex items-center justify-between bg-secondary rounded-2xl p-5 mb-5">
                 <span className="text-sm font-medium text-foreground">Duration</span>
                 <div className="flex items-center gap-4">
-                  <button
+                  <motion.button
                     onClick={() => setDuration(Math.max(1, duration - 1))}
                     className="w-8 h-8 rounded-full bg-card border border-border text-foreground flex items-center justify-center font-bold text-lg active:bg-secondary transition-colors"
-                  >−</button>
-                  <span className="font-display font-bold text-lg text-foreground w-8 text-center">{duration}h</span>
-                  <button
+                    whileTap={{ scale: 0.85 }}
+                  >−</motion.button>
+                  <AnimatePresence mode="wait">
+                    <motion.span
+                      key={duration}
+                      className="font-display font-bold text-lg text-foreground w-8 text-center"
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 8 }}
+                      transition={{ duration: 0.12 }}
+                    >{duration}h</motion.span>
+                  </AnimatePresence>
+                  <motion.button
                     onClick={() => setDuration(Math.min(12, duration + 1))}
                     className="w-8 h-8 rounded-full bg-card border border-border text-foreground flex items-center justify-center font-bold text-lg active:bg-secondary transition-colors"
-                  >+</button>
+                    whileTap={{ scale: 0.85 }}
+                  >+</motion.button>
                 </div>
               </div>
 
-              <div className="space-y-2 mb-5">
+              <div className="space-y-2 mb-6">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">${spot.price} × {duration} hours</span>
                   <span className="text-foreground">${total.toFixed(2)}</span>
@@ -131,6 +143,7 @@ export default function BookingSheet({ spot, onClose, onNavigate }: BookingSheet
               className="text-center py-8"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: "spring", damping: 15, stiffness: 200 }}
             >
               <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
                 <Check className="w-8 h-8 text-accent" />

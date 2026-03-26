@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { CalendarCheck, MessageSquare, Clock, Car, ChevronRight } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -55,18 +56,24 @@ const PAST = [
 export default function ActivityView() {
   return (
     <ScrollArea className="h-full">
-      <div className="px-4 pt-3 pb-24 space-y-7">
+      <div className="px-4 pt-14 pb-24 space-y-8">
 
         {/* Upcoming */}
-        <section>
+        <motion.section
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
           <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-3">
             Upcoming
           </h3>
           <div className="space-y-3">
             {UPCOMING.map((item, i) => (
-              <div
+              <motion.div
                 key={i}
                 className="relative overflow-hidden rounded-2xl bg-card border border-border p-4"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.06 }}
               >
                 <div className="flex items-start justify-between mb-2">
                   <div>
@@ -84,21 +91,32 @@ export default function ActivityView() {
                   </div>
                   <span className="text-sm font-semibold text-foreground">{item.price}</span>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
-        </section>
+        </motion.section>
+
+        {/* Divider */}
+        <div className="h-px bg-border" />
 
         {/* Messages */}
-        <section>
+        <motion.section
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.15 }}
+        >
           <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-3">
             Messages
           </h3>
-          <div className="space-y-1">
+          <div className="space-y-2">
             {NOTIFICATIONS.map((n, i) => (
-              <div
+              <motion.div
                 key={i}
                 className="flex items-center gap-3 p-3 rounded-xl hover:bg-secondary/50 transition-colors"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 + i * 0.06 }}
+                whileTap={{ scale: 0.98 }}
               >
                 <div className="relative">
                   <img src={n.avatar} alt={n.name} className="w-10 h-10 rounded-full object-cover bg-secondary" />
@@ -114,21 +132,31 @@ export default function ActivityView() {
                   <span className="text-[10px] text-muted-foreground">{n.time}</span>
                   <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50" />
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
-        </section>
+        </motion.section>
+
+        {/* Divider */}
+        <div className="h-px bg-border" />
 
         {/* Past */}
-        <section>
+        <motion.section
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+        >
           <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-3">
             Past Bookings
           </h3>
-          <div className="space-y-1">
+          <div className="space-y-2">
             {PAST.map((item, i) => (
-              <div
+              <motion.div
                 key={i}
                 className="flex items-center justify-between p-3 rounded-xl"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 + i * 0.06 }}
               >
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
@@ -140,10 +168,10 @@ export default function ActivityView() {
                   </div>
                 </div>
                 <span className="text-sm text-muted-foreground">{item.price}</span>
-              </div>
+              </motion.div>
             ))}
           </div>
-        </section>
+        </motion.section>
       </div>
     </ScrollArea>
   );
