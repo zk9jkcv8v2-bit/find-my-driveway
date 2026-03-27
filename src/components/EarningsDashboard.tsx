@@ -150,7 +150,7 @@ function ChartBar({ day, amount, maxAmount, index, period }: { day: string; amou
           className="w-full rounded-lg relative overflow-hidden"
           style={{
             background: isMax
-              ? "linear-gradient(to top, hsl(var(--accent)), hsl(152 60% 58%))"
+              ? "linear-gradient(to top, hsl(var(--accent)), hsl(var(--accent) / 0.7))"
               : "hsl(var(--accent))",
             boxShadow: isMax ? "0 0 12px hsl(var(--accent) / 0.4)" : "none",
           }}

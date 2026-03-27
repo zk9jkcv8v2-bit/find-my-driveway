@@ -30,8 +30,8 @@ function createPinIcon() {
     className: "parkr-marker",
     html: `<div style="
       width:32px;height:32px;border-radius:50% 50% 50% 0;
-      background:hsl(217,91%,60%);transform:rotate(-45deg);
-      border:3px solid #fff;box-shadow:0 2px 12px rgba(59,130,246,0.4);
+      background:hsl(var(--primary));transform:rotate(-45deg);
+      border:3px solid hsl(var(--card));box-shadow:0 2px 12px hsl(var(--primary) / 0.4);
     "></div>`,
     iconSize: [32, 32],
     iconAnchor: [16, 32],
@@ -151,7 +151,7 @@ export default function ListSpotWizard() {
                       <>
                         <img src={photos[0]} alt="Spot" className="w-full h-full object-cover absolute inset-0" />
                         <button
-                          className="absolute top-2 right-2 w-7 h-7 rounded-full bg-foreground/60 flex items-center justify-center z-10"
+                          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-foreground/60 flex items-center justify-center z-10"
                           onClick={(e) => { e.stopPropagation(); removePhoto(0); }}
                         >
                           <X className="w-4 h-4 text-primary-foreground" />

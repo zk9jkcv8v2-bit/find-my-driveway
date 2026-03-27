@@ -1,7 +1,9 @@
-import { useState, useMemo } from "react";
-import { motion } from "framer-motion";
+import { useState, useMemo, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, Star, Zap, ChevronDown, Calendar, Music, Building2, Gift, MapPin, Dumbbell, GraduationCap, Landmark, ShoppingBag } from "lucide-react";
-import { MOCK_SPOTS, type SpotMarker } from "./MapView";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { MOCK_SPOTS, type SpotMarker } from "./spots-data";
 
 const FILTERS = [
   { label: "Events", icon: Calendar },
@@ -23,6 +25,12 @@ interface HomeFeedProps {
 export default function HomeFeed({ onBook, onNavigateToExplore }: HomeFeedProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 800);
+    return () => clearTimeout(timer);
+  }, []);
 
   const filteredSpots = useMemo(() => {
     let spots = MOCK_SPOTS.filter((s) => s.available);
@@ -53,17 +61,18 @@ export default function HomeFeed({ onBook, onNavigateToExplore }: HomeFeedProps)
 
       {/* Search */}
       <div className="px-4 mb-4">
-        <div className="flex items-center gap-3 bg-card rounded-lg px-3 py-3 border border-border">
+        <div className="flex items-center gap-3 bg-secondary rounded-xl px-3 py-3 border border-border">
           <Search className="w-4 h-4 text-muted-foreground shrink-0" />
           <input
             type="text"
             placeholder="Search Parkr..."
+            aria-label="Search for parking spots"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
+            className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none focus-visible:ring-0"
           />
           {searchQuery && (
-            <button onClick={() => setSearchQuery("")}>
+            <button onClick={() => setSearchQuery("")} aria-label="Clear search">
               <X className="w-4 h-4 text-muted-foreground" />
             </button>
           )}
@@ -78,7 +87,9 @@ export default function HomeFeed({ onBook, onNavigateToExplore }: HomeFeedProps)
             <motion.button
               key={f.label}
               onClick={() => setActiveFilter(activeFilter === f.label ? null : f.label)}
-              className={`shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium border transition-colors ${
+              aria-label={`Filter by ${f.label}`}
+              aria-pressed={activeFilter === f.label}
+              className={`shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium border transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 ${
                 activeFilter === f.label
                   ? "bg-foreground text-background border-foreground"
                   : "bg-card text-foreground border-border"
@@ -92,62 +103,89 @@ export default function HomeFeed({ onBook, onNavigateToExplore }: HomeFeedProps)
         })}
       </div>
 
+      {/* Result count */}
+      {!loading && (
+        <p className="text-xs text-muted-foreground px-4 mb-2">
+          {filteredSpots.length} spot{filteredSpots.length !== 1 ? "s" : ""} found
+        </p>
+      )}
+
       {/* Spot list */}
-      <div className="flex-1 overflow-y-auto px-4 pb-24 space-y-6">
-        {filteredSpots.map((spot, i) => (
-          <motion.div
-            key={spot.id}
-            className="overflow-hidden"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            {/* Image */}
-            <button
-              className="relative w-full aspect-[16/10] overflow-hidden rounded-xl"
-              onClick={() => onNavigateToExplore(spot)}
-            >
-              {spot.image ? (
-                <img src={spot.image} alt={spot.address} className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full bg-secondary flex items-center justify-center text-3xl">
-                  🅿️
-                </div>
-              )}
-              {/* Distance badge */}
-              <span className="absolute top-3 left-3 text-[11px] font-bold px-2.5 py-1 rounded bg-accent text-accent-foreground">
-                {spot.distance}
-              </span>
-            </button>
-
-            {/* Info */}
-            <div className="pt-3 pb-2">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">{spot.address.split(",")[0]?.trim()}</p>
-                  <p className="font-display font-bold text-foreground text-base">
-                    ${spot.price.toFixed(2)} / hour
-                  </p>
-                </div>
-                <div className="flex items-center gap-1 mt-0.5">
-                  <Star className="w-3.5 h-3.5 fill-warning text-warning" />
-                  <span className="text-xs font-semibold text-foreground">{spot.rating}</span>
-                  <span className="text-xs text-muted-foreground">(4)</span>
-                </div>
+      {loading ? (
+        <div className="flex-1 overflow-y-auto px-4 pb-24 space-y-6">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="overflow-hidden">
+              <Skeleton className="w-full aspect-[16/10] rounded-xl" />
+              <div className="pt-3 pb-2 space-y-2">
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-5 w-1/2" />
+                <Skeleton className="h-10 w-full rounded-xl mt-1" />
               </div>
-
-              <motion.button
-                onClick={() => onBook(spot)}
-                className="w-full mt-3 flex items-center justify-center gap-2 py-3 rounded-lg font-bold text-sm transition-colors bg-primary text-primary-foreground"
-                whileTap={{ scale: 0.97 }}
-              >
-                Park now
-              </motion.button>
             </div>
-          </motion.div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : filteredSpots.length === 0 ? (
+        <div className="flex-1 flex flex-col items-center justify-center text-center px-8">
+          <MapPin className="w-10 h-10 text-muted-foreground/40 mb-3" />
+          <p className="text-sm font-medium text-muted-foreground">No spots match your filters</p>
+          <p className="text-xs text-muted-foreground/70 mt-1">Try adjusting your search or filters</p>
+        </div>
+      ) : (
+        <div className="flex-1 overflow-y-auto px-4 pb-24 space-y-6">
+          {filteredSpots.map((spot, i) => (
+            <motion.div
+              key={spot.id}
+              className="overflow-hidden"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              {/* Image */}
+              <button
+                className="relative w-full aspect-[16/10] overflow-hidden rounded-xl focus-visible:ring-2 focus-visible:ring-primary"
+                aria-label={`View ${spot.address}`}
+                onClick={() => onNavigateToExplore(spot)}
+              >
+                {spot.image ? (
+                  <img src={spot.image} alt={spot.address} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = "none" }} />
+                ) : (
+                  <div className="w-full h-full bg-secondary flex items-center justify-center text-3xl">
+                    🅿️
+                  </div>
+                )}
+                {/* Distance badge */}
+                <span className="absolute top-3 left-3 text-[11px] font-bold px-2.5 py-1 rounded-lg bg-accent text-accent-foreground">
+                  {spot.distance}
+                </span>
+              </button>
+
+              {/* Info */}
+              <div className="pt-3 pb-2">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">{spot.address.split(",")[0]?.trim()}</p>
+                    <p className="font-display font-bold text-foreground text-base">
+                      ${spot.price.toFixed(2)} / hour
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1 mt-0.5">
+                    <Star className="w-3.5 h-3.5 fill-warning text-warning" />
+                    <span className="text-xs font-semibold text-foreground">{spot.rating}</span>
+                    <span className="text-xs text-muted-foreground">({Math.floor(spot.rating * 3 + parseInt(spot.id))} reviews)</span>
+                  </div>
+                </div>
+
+                <motion.div whileTap={{ scale: 0.97 }} className="mt-3">
+                  <Button variant="cta" className="w-full" onClick={() => onBook(spot)}>
+                    Park now
+                  </Button>
+                </motion.div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

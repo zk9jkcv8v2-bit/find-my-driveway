@@ -28,7 +28,9 @@ export default function FilterBar({ activeFilter, onFilterChange }: FilterBarPro
           <motion.button
             key={filter.label}
             onClick={() => onFilterChange(isActive ? null : filter.label)}
-            className={`shrink-0 gap-1.5 rounded-full h-8 px-3 text-sm font-medium inline-flex items-center border transition-colors ${
+            aria-label={`Filter by ${filter.label}`}
+            aria-pressed={isActive}
+            className={`shrink-0 gap-1.5 rounded-full h-9 px-3 text-sm font-medium inline-flex items-center border transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 ${
               isActive
                 ? "bg-primary text-primary-foreground border-primary"
                 : "bg-card text-foreground border-border hover:bg-secondary"
