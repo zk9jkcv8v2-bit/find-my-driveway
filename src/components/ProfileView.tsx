@@ -58,7 +58,7 @@ export default function ProfileView() {
   }, [theme]);
 
   const BackButton = () => (
-    <button onClick={() => setSubScreen("main")} className="flex items-center gap-1 text-sm text-muted-foreground mb-6 hover:text-foreground transition-colors">
+    <button onClick={() => setSubScreen("main")} aria-label="Go back" className="flex items-center gap-1 text-sm text-muted-foreground mb-6 hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-primary rounded">
       <ArrowLeft className="w-4 h-4" /> Back
     </button>
   );
@@ -140,10 +140,13 @@ export default function ProfileView() {
               </div>
               <button
                 onClick={() => {
-                  setVehicles(vehicles.filter(x => x.id !== v.id));
-                  toast({ title: "Vehicle removed", description: `${v.make} has been removed.` });
+                  if (window.confirm(`Remove ${v.make}?`)) {
+                    setVehicles(vehicles.filter(x => x.id !== v.id));
+                    toast({ title: "Vehicle removed", description: `${v.make} has been removed.` });
+                  }
                 }}
-                className="w-8 h-8 rounded-full hover:bg-destructive/10 flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors"
+                aria-label={`Remove ${v.make}`}
+                className="w-10 h-10 rounded-full hover:bg-destructive/10 flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors focus-visible:ring-2 focus-visible:ring-primary"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -194,10 +197,13 @@ export default function ProfileView() {
               </div>
               <button
                 onClick={() => {
-                  setSavedSpots(savedSpots.filter(s => s.id !== spot.id));
-                  toast({ title: "Spot removed", description: `${spot.address} removed from saved.` });
+                  if (window.confirm(`Remove ${spot.address}?`)) {
+                    setSavedSpots(savedSpots.filter(s => s.id !== spot.id));
+                    toast({ title: "Spot removed", description: `${spot.address} removed from saved.` });
+                  }
                 }}
-                className="w-8 h-8 rounded-full hover:bg-destructive/10 flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors"
+                aria-label={`Remove ${spot.address}`}
+                className="w-10 h-10 rounded-full hover:bg-destructive/10 flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors focus-visible:ring-2 focus-visible:ring-primary"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -338,11 +344,13 @@ export default function ProfileView() {
                 return (
                   <button
                     key={opt.value}
+                    aria-pressed={active}
+                    aria-label={`${opt.label} theme`}
                     onClick={() => {
                       setTheme(opt.value);
                       toast({ title: `Theme: ${opt.label}`, description: `Switched to ${opt.label.toLowerCase()} mode.` });
                     }}
-                    className={`flex flex-col items-center gap-1.5 py-3 rounded-xl transition-all ${
+                    className={`flex flex-col items-center gap-1.5 py-3 rounded-xl transition-all focus-visible:ring-2 focus-visible:ring-primary ${
                       active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-secondary"
                     }`}
                   >

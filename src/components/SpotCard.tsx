@@ -18,7 +18,8 @@ export default function SpotCard({ spot, onBook, onNavigate, onChat, compact = f
   if (compact) {
     return (
       <motion.button
-        className="soft-card p-3 w-[200px] shrink-0 text-left"
+        className="soft-card p-3 w-[200px] shrink-0 text-left snap-start focus-visible:ring-2 focus-visible:ring-primary"
+        aria-label={`Book ${spot.address} for $${spot.price.toFixed(2)}/hr`}
         whileTap={{ scale: 0.97 }}
         whileHover={{ y: -3, boxShadow: "0 6px 20px rgba(0,0,0,0.08)" }}
         onClick={() => onBook(spot)}
@@ -55,7 +56,7 @@ export default function SpotCard({ spot, onBook, onNavigate, onChat, compact = f
       <div className="flex items-start gap-4">
         {/* Spot image */}
         {spot.image ? (
-          <img src={spot.image} alt={spot.address} className="w-24 h-24 rounded-xl object-cover shrink-0" />
+          <img src={spot.image} alt={spot.address} className="w-24 h-24 rounded-xl object-cover shrink-0" onError={(e) => { e.currentTarget.style.display = "none" }} />
         ) : (
           <div className="w-24 h-24 rounded-xl bg-secondary flex items-center justify-center text-2xl shrink-0">
             {typeEmoji}
@@ -75,7 +76,7 @@ export default function SpotCard({ spot, onBook, onNavigate, onChat, compact = f
 
           {/* Host info */}
           <div className="flex items-center gap-2 mb-2">
-            <img src={spot.host.avatar} alt={spot.host.name} className="w-5 h-5 rounded-full object-cover" />
+            <img src={spot.host.avatar} alt={spot.host.name} className="w-5 h-5 rounded-full object-cover" onError={(e) => { e.currentTarget.style.display = "none" }} />
             <span className="text-[11px] font-medium text-foreground">{spot.host.name}</span>
             {spot.host.verified && <BadgeCheck className="w-3.5 h-3.5 text-primary" />}
           </div>
@@ -108,6 +109,7 @@ export default function SpotCard({ spot, onBook, onNavigate, onChat, compact = f
                 <Button
                   variant="ghost"
                   size="icon"
+                  aria-label="Chat with host"
                   className="h-9 w-9 rounded-full"
                   onClick={() => onChat(spot)}
                 >
@@ -117,6 +119,7 @@ export default function SpotCard({ spot, onBook, onNavigate, onChat, compact = f
               <Button
                 variant="ghost"
                 size="icon"
+                aria-label="Get directions"
                 className="h-9 w-9 rounded-full"
                 onClick={() => onNavigate(spot)}
               >

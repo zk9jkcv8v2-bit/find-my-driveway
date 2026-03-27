@@ -11,22 +11,22 @@ const OREBRO_CENTER: [number, number] = [59.2753, 15.2134];
 
 function createPriceIcon(price: number, isSelected: boolean, hasEV: boolean) {
   const bg = isSelected
-    ? "linear-gradient(135deg, hsl(217, 91%, 55%), hsl(217, 91%, 45%))"
+    ? "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary)))"
     : hasEV
-      ? "linear-gradient(135deg, hsl(152, 60%, 45%), hsl(152, 60%, 38%))"
-      : "linear-gradient(135deg, hsl(0, 0%, 100%), hsl(220, 14%, 96%))";
+      ? "linear-gradient(135deg, hsl(var(--accent)), hsl(var(--accent)))"
+      : "linear-gradient(135deg, hsl(var(--card)), hsl(var(--secondary)))";
   const flatBg = isSelected
-    ? "hsl(217, 91%, 50%)"
+    ? "hsl(var(--primary))"
     : hasEV
-      ? "hsl(152, 60%, 42%)"
-      : "hsl(220, 14%, 96%)";
-  const color = isSelected || hasEV ? "#ffffff" : "hsl(220, 20%, 14%)";
+      ? "hsl(var(--accent))"
+      : "hsl(var(--secondary))";
+  const color = isSelected || hasEV ? "#ffffff" : "hsl(var(--foreground))";
   const shadow = isSelected
-    ? "0 6px 20px rgba(59, 130, 246, 0.45), 0 2px 6px rgba(59, 130, 246, 0.2)"
+    ? "0 6px 20px hsl(var(--primary) / 0.45), 0 2px 6px hsl(var(--primary) / 0.2)"
     : hasEV
-      ? "0 4px 14px rgba(34, 197, 94, 0.3), 0 2px 4px rgba(34, 197, 94, 0.1)"
+      ? "0 4px 14px hsl(var(--accent) / 0.3), 0 2px 4px hsl(var(--accent) / 0.1)"
       : "0 3px 12px rgba(0, 0, 0, 0.1), 0 1px 4px rgba(0, 0, 0, 0.06)";
-  const border = isSelected || hasEV ? "none" : "1.5px solid hsl(220, 14%, 88%)";
+  const border = isSelected || hasEV ? "none" : "1.5px solid hsl(var(--border))";
   const scale = isSelected ? "transform: scale(1.15);" : "";
   const fontSize = isSelected ? "14px" : "12.5px";
 
@@ -82,16 +82,16 @@ function createUserIcon() {
         <div style="
           width: 18px; height: 18px;
           border-radius: 50%;
-          background: hsl(217, 91%, 60%);
-          border: 3px solid #fff;
-          box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+          background: hsl(var(--primary));
+          border: 3px solid hsl(var(--card));
+          box-shadow: 0 2px 8px hsl(var(--primary) / 0.4);
           position: relative; z-index: 2;
         "></div>
         <div style="
           position: absolute; top: -11px; left: -11px;
           width: 40px; height: 40px;
           border-radius: 50%;
-          background: hsla(217, 91%, 60%, 0.12);
+          background: hsl(var(--primary) / 0.12);
           animation: parkr-pulse 2s ease-in-out infinite;
         "></div>
       </div>
@@ -183,7 +183,7 @@ export default function MapView({ onSpotSelect, selectedSpot, spots }: MapViewPr
           50% { opacity: 0; transform: scale(2.2); }
         }
         .leaflet-control-attribution { font-size: 9px !important; opacity: 0.5; }
-        .leaflet-container { background: hsl(220, 14%, 96%); }
+        .leaflet-container { background: hsl(var(--secondary)); }
         .leaflet-control-zoom {
           border: none !important;
           border-radius: 12px !important;

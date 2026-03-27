@@ -60,7 +60,7 @@ export default function BookingSheet({ spot, onClose, onNavigate }: BookingSheet
             <div className="w-10 h-1 rounded-full bg-border" />
           </div>
 
-          <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+          <button onClick={onClose} aria-label="Close booking" className="absolute top-4 right-4 w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-primary">
             <X className="w-4 h-4" />
           </button>
 
@@ -78,7 +78,9 @@ export default function BookingSheet({ spot, onClose, onNavigate }: BookingSheet
                     <motion.button
                       key={opt.label}
                       onClick={() => setSelectedTime(i)}
-                      className={`flex flex-col items-center gap-1 p-4 rounded-2xl border-2 transition-all ${
+                      aria-label={opt.label}
+                      aria-pressed={selectedTime === i}
+                      className={`flex flex-col items-center gap-1 p-4 rounded-2xl border-2 transition-all focus-visible:ring-2 focus-visible:ring-primary ${
                         selectedTime === i
                           ? "border-primary bg-primary/5"
                           : "border-border hover:border-primary/30"
@@ -97,7 +99,8 @@ export default function BookingSheet({ spot, onClose, onNavigate }: BookingSheet
                 <div className="flex items-center gap-4">
                   <motion.button
                     onClick={() => setDuration(Math.max(1, duration - 1))}
-                    className="w-8 h-8 rounded-full bg-card border border-border text-foreground flex items-center justify-center font-bold text-lg active:bg-secondary transition-colors"
+                    aria-label="Decrease duration"
+                    className="w-10 h-10 rounded-full bg-card border border-border text-foreground flex items-center justify-center font-bold text-lg active:bg-secondary transition-colors focus-visible:ring-2 focus-visible:ring-primary"
                     whileTap={{ scale: 0.85 }}
                   >−</motion.button>
                   <AnimatePresence mode="wait">
@@ -112,7 +115,8 @@ export default function BookingSheet({ spot, onClose, onNavigate }: BookingSheet
                   </AnimatePresence>
                   <motion.button
                     onClick={() => setDuration(Math.min(12, duration + 1))}
-                    className="w-8 h-8 rounded-full bg-card border border-border text-foreground flex items-center justify-center font-bold text-lg active:bg-secondary transition-colors"
+                    aria-label="Increase duration"
+                    className="w-10 h-10 rounded-full bg-card border border-border text-foreground flex items-center justify-center font-bold text-lg active:bg-secondary transition-colors focus-visible:ring-2 focus-visible:ring-primary"
                     whileTap={{ scale: 0.85 }}
                   >+</motion.button>
                 </div>

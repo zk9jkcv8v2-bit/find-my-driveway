@@ -66,12 +66,13 @@ export default function HomeFeed({ onBook, onNavigateToExplore }: HomeFeedProps)
           <input
             type="text"
             placeholder="Search Parkr..."
+            aria-label="Search for parking spots"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
+            className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none focus-visible:ring-0"
           />
           {searchQuery && (
-            <button onClick={() => setSearchQuery("")}>
+            <button onClick={() => setSearchQuery("")} aria-label="Clear search">
               <X className="w-4 h-4 text-muted-foreground" />
             </button>
           )}
@@ -86,7 +87,9 @@ export default function HomeFeed({ onBook, onNavigateToExplore }: HomeFeedProps)
             <motion.button
               key={f.label}
               onClick={() => setActiveFilter(activeFilter === f.label ? null : f.label)}
-              className={`shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium border transition-colors ${
+              aria-label={`Filter by ${f.label}`}
+              aria-pressed={activeFilter === f.label}
+              className={`shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium border transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 ${
                 activeFilter === f.label
                   ? "bg-foreground text-background border-foreground"
                   : "bg-card text-foreground border-border"
@@ -140,11 +143,12 @@ export default function HomeFeed({ onBook, onNavigateToExplore }: HomeFeedProps)
             >
               {/* Image */}
               <button
-                className="relative w-full aspect-[16/10] overflow-hidden rounded-xl"
+                className="relative w-full aspect-[16/10] overflow-hidden rounded-xl focus-visible:ring-2 focus-visible:ring-primary"
+                aria-label={`View ${spot.address}`}
                 onClick={() => onNavigateToExplore(spot)}
               >
                 {spot.image ? (
-                  <img src={spot.image} alt={spot.address} className="w-full h-full object-cover" />
+                  <img src={spot.image} alt={spot.address} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = "none" }} />
                 ) : (
                   <div className="w-full h-full bg-secondary flex items-center justify-center text-3xl">
                     🅿️

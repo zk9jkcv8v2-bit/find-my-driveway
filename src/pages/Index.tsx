@@ -2,6 +2,7 @@ import { useState, useMemo, lazy, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MOCK_SPOTS, type SpotMarker } from "@/components/spots-data";
 const LazyMapView = lazy(() => import("@/components/MapView"));
+import ErrorBoundary from "@/components/ErrorBoundary";
 import FilterBar from "@/components/FilterBar";
 import SpotCard from "@/components/SpotCard";
 import BookingSheet from "@/components/BookingSheet";
@@ -94,6 +95,7 @@ export default function Index() {
                   <input
                     type="text"
                     placeholder="Find parking nearby"
+                    aria-label="Search parking nearby"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onFocus={() => setSearchFocused(true)}
@@ -101,7 +103,7 @@ export default function Index() {
                     className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
                   />
                   {searchQuery && (
-                    <button onClick={() => setSearchQuery("")}>
+                    <button onClick={() => setSearchQuery("")} aria-label="Clear search">
                       <X className="w-4 h-4 text-muted-foreground" />
                     </button>
                   )}
@@ -111,6 +113,11 @@ export default function Index() {
 
             {/* Map */}
             <div className="flex-1">
+              <ErrorBoundary fallback={
+                <div className="flex-1 h-full flex items-center justify-center bg-secondary">
+                  <p className="text-sm text-muted-foreground">Failed to load map</p>
+                </div>
+              }>
               <Suspense fallback={
                 <div className="flex-1 h-full flex items-center justify-center bg-secondary">
                   <div className="flex flex-col items-center gap-2">
@@ -128,6 +135,7 @@ export default function Index() {
                   spots={filteredSpots}
                 />
               </Suspense>
+              </ErrorBoundary>
             </div>
 
             {/* Bottom sheet */}
@@ -139,6 +147,8 @@ export default function Index() {
             >
               <button
                 className="w-full pt-3 pb-2 flex justify-center"
+                aria-label="Toggle spot details"
+                aria-expanded={sheetExpanded}
                 onClick={() => {
                   if (selectedSpot) {
                     setSheetExpanded(!sheetExpanded);
@@ -163,7 +173,7 @@ export default function Index() {
                       {filteredSpots.length} spots nearby
                     </p>
                   </div>
-                  <div className="flex gap-3 px-4 overflow-x-auto no-scrollbar pb-4">
+                  <div className="flex gap-3 px-4 overflow-x-auto no-scrollbar pb-4 snap-x snap-mandatory">
                     {filteredSpots.map((spot) => (
                       <SpotCard
                         key={spot.id}

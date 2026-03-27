@@ -30,8 +30,8 @@ function createPinIcon() {
     className: "parkr-marker",
     html: `<div style="
       width:32px;height:32px;border-radius:50% 50% 50% 0;
-      background:hsl(217,91%,60%);transform:rotate(-45deg);
-      border:3px solid #fff;box-shadow:0 2px 12px rgba(59,130,246,0.4);
+      background:hsl(var(--primary));transform:rotate(-45deg);
+      border:3px solid hsl(var(--card));box-shadow:0 2px 12px hsl(var(--primary) / 0.4);
     "></div>`,
     iconSize: [32, 32],
     iconAnchor: [16, 32],
