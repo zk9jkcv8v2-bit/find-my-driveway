@@ -10,26 +10,15 @@ interface BookingSheetProps {
   onNavigate?: (spot: SpotMarker) => void;
 }
 
-// Duration drum config
+// Duration ruler config
 const TICK_COUNT = 20;        // 15-min increments → max 5h
-const TICK_STEP = 16;         // px per tick (center to center)
-const DRUM_WIDTH = 300;       // visible viewport width
-const DRUM_HALF = DRUM_WIDTH / 2;
-const MAX_TICK_H = 40;
-const MIN_TICK_H = 4;
-
-/** Bell-curve height: tallest at center, fades toward edges */
-function drumTickHeight(pixelDistFromCenter: number): number {
-  const ratio = Math.min(pixelDistFromCenter / DRUM_HALF, 1);
-  const curve = 1 - ratio * ratio;          // quadratic falloff
-  return MIN_TICK_H + (MAX_TICK_H - MIN_TICK_H) * Math.max(curve, 0);
-}
-
-/** Opacity: bright at center, fades toward edges */
-function drumTickOpacity(pixelDistFromCenter: number): number {
-  const ratio = Math.min(pixelDistFromCenter / DRUM_HALF, 1);
-  return 1 - ratio * 0.7;
-}
+const TICK_GAP = 8;           // px gap between ticks
+const TICK_W = 2;             // px tick width
+const TICK_STEP = TICK_W + TICK_GAP; // 10px center-to-center
+const TICK_H = 20;            // normal tick height
+const TICK_H_ACTIVE = 32;    // center/selected tick height
+const RULER_WIDTH = 300;      // visible viewport
+const RULER_HALF = RULER_WIDTH / 2;
 
 const MODES = ["Now", "Later", "Schedule"] as const;
 type Mode = typeof MODES[number];
@@ -255,10 +244,10 @@ export default function BookingSheet({ spot, onClose, onNavigate }: BookingSheet
                 {" · "}{durationLabel}
               </motion.p>
 
-              {/* ── Duration drum ── */}
+              {/* ── Duration ruler ── */}
               <div
-                className="relative mt-10 mb-2 touch-none select-none cursor-grab active:cursor-grabbing"
-                style={{ width: DRUM_WIDTH, height: MAX_TICK_H + 8 }}
+                className="relative mt-10 mb-2 touch-none select-none cursor-grab active:cursor-grabbing overflow-hidden"
+                style={{ width: RULER_WIDTH, height: TICK_H_ACTIVE + 4 }}
                 role="slider"
                 aria-label="Select parking duration"
                 aria-valuemin={1}
@@ -269,42 +258,28 @@ export default function BookingSheet({ spot, onClose, onNavigate }: BookingSheet
                 onPointerUp={handleDrumUp}
                 onPointerCancel={handleDrumUp}
               >
-                {/* Fade masks on edges */}
-                <div className="absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-card to-transparent z-10 pointer-events-none" />
-                <div className="absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-card to-transparent z-10 pointer-events-none" />
-
-                {/* Tick strip — each slot is TICK_STEP wide, strip slides so scrollPos tick is centered */}
+                {/* Tick strip — slides so scrollPos tick sits at center */}
                 <motion.div
                   className="absolute top-0 bottom-0 flex items-center"
-                  animate={{ x: DRUM_HALF - scrollPos * TICK_STEP - TICK_STEP / 2 }}
+                  style={{ gap: TICK_GAP }}
+                  animate={{ x: RULER_HALF - scrollPos * TICK_STEP - TICK_W / 2 }}
                   transition={isDragging ? { duration: 0 } : { type: "spring", damping: 28, stiffness: 350 }}
                 >
                   {Array.from({ length: TICK_COUNT }).map((_, i) => {
-                    const pxFromCenter = (i - scrollPos) * TICK_STEP;
-                    const dist = Math.abs(pxFromCenter);
-                    const h = drumTickHeight(dist);
-                    const opacity = drumTickOpacity(dist);
-                    const isCenter = Math.abs(i - scrollPos) < 0.5;
+                    const isCenter = Math.abs(i - Math.round(scrollPos)) < 0.5;
+                    const isLeft = i < Math.round(scrollPos);
 
                     return (
                       <div
                         key={i}
-                        className="shrink-0 flex items-center justify-center"
-                        style={{ width: TICK_STEP, height: MAX_TICK_H + 8 }}
+                        className="shrink-0 rounded-full"
                         onClick={() => handleTickTap(i)}
-                      >
-                        <div
-                          className={`rounded-full ${
-                            isCenter ? "bg-primary" : "bg-muted-foreground/20"
-                          }`}
-                          style={{
-                            width: isCenter ? 5 : 3,
-                            height: Math.round(h),
-                            opacity,
-                            transition: "height 80ms ease-out, width 80ms ease-out, opacity 80ms ease-out",
-                          }}
-                        />
-                      </div>
+                        style={{
+                          width: TICK_W,
+                          height: isCenter ? TICK_H_ACTIVE : TICK_H,
+                          backgroundColor: isCenter ? "#0ABF76" : isLeft ? "#D0D0D0" : "#E8E8E8",
+                        }}
+                      />
                     );
                   })}
                 </motion.div>
