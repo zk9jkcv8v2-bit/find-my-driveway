@@ -210,7 +210,7 @@ export default function MapView({ onSpotSelect, selectedSpot, spots }: MapViewPr
         center={OREBRO_CENTER}
         zoom={14}
         className="w-full h-full z-0"
-        zoomControl={true}
+        zoomControl={false}
         attributionControl={true}
       >
         <TileLayer
