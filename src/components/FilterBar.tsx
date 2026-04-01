@@ -16,7 +16,7 @@ interface FilterBarProps {
 export default function FilterBar({ activeFilter, onFilterChange }: FilterBarProps) {
   return (
     <motion.div
-      className="flex gap-2 px-4 overflow-x-auto no-scrollbar"
+      className="flex gap-2 px-4 overflow-x-auto no-scrollbar justify-center"
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.15 }}
