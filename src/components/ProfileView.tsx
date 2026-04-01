@@ -417,73 +417,95 @@ export default function ProfileView() {
     );
   }
 
-  // Main profile — grouped like reference image 2
-  const HISTORY_ITEMS = [
-    { label: "Parking & charging", icon: Car, screen: "saved" as SubScreen },
-    { label: "Earnings", icon: DollarSign, screen: "earnings" as SubScreen },
+  // Main profile
+  const MENU_ITEMS = [
+    { label: "Earnings", icon: DollarSign, desc: "View your host earnings", color: "text-accent", screen: "earnings" as SubScreen },
+    { label: "Settings", icon: Settings, desc: "Theme, language, preferences", color: "text-muted-foreground", screen: "settings" as SubScreen },
+    { label: "Verification", icon: Shield, desc: "Identity verified", color: "text-accent", screen: "verification" as SubScreen },
+    { label: "My Vehicles", icon: Car, desc: `${vehicles.length} vehicles added`, color: "text-primary", screen: "vehicles" as SubScreen },
+    { label: "Saved Spots", icon: MapPin, desc: `${savedSpots.length} saved`, color: "text-primary", screen: "saved" as SubScreen },
+    { label: "Notifications", icon: Bell, desc: "Manage preferences", color: "text-primary", screen: "notifications" as SubScreen },
+    { label: "Help & Support", icon: HelpCircle, desc: "FAQ, disputes", color: "text-muted-foreground", screen: "help" as SubScreen },
   ];
 
-  const VEHICLES_PAYMENT_ITEMS = [
-    { label: "My Vehicles", icon: Car, screen: "vehicles" as SubScreen, toggle: false },
-    { label: "Verification", icon: Shield, screen: "verification" as SubScreen, toggle: false },
-  ];
+  return (
+    <div className="min-h-screen bg-background pb-24 px-4 pt-14">
+      {/* Profile header */}
+      <motion.div
+        className="flex items-center gap-4 mb-6"
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-xl font-display font-extrabold text-primary">
+          JD
+        </div>
+        <div className="flex-1">
+          <h1 className="font-display font-extrabold text-xl text-foreground">Jordan Doe</h1>
+          <p className="text-sm text-muted-foreground">Member since 2024</p>
+        </div>
+      </motion.div>
 
-  const SUPPORT_ITEMS = [
-    { label: "Help & Support", icon: HelpCircle, screen: "help" as SubScreen },
-    { label: "Notifications", icon: Bell, screen: "notifications" as SubScreen },
-    { label: "Settings", icon: Settings, screen: "settings" as SubScreen },
-  ];
+      {/* Stats */}
+      <motion.div
+        className="grid grid-cols-3 gap-4 mb-6"
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+      >
+        <div className="soft-card p-4 text-center">
+          <p className="font-display font-extrabold text-xl text-foreground">47</p>
+          <p className="text-xs text-muted-foreground">Bookings</p>
+        </div>
+        <div className="soft-card p-4 text-center">
+          <div className="flex items-center justify-center gap-0.5">
+            <Star className="w-3.5 h-3.5 text-warning fill-warning" />
+            <p className="font-display font-extrabold text-xl text-foreground">4.9</p>
+          </div>
+          <p className="text-xs text-muted-foreground">Rating</p>
+        </div>
+        <div className="soft-card p-4 text-center">
+          <p className="font-display font-extrabold text-xl text-accent">✓</p>
+          <p className="text-xs text-muted-foreground">Verified</p>
+        </div>
+      </motion.div>
 
-  const MenuSection = ({ title, items }: { title: string; items: { label: string; icon: any; screen: SubScreen }[] }) => (
-    <motion.div
-      className="mb-6"
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-    >
-      <p className="text-sm font-bold text-foreground mb-2 px-1">{title}</p>
-      <div className="soft-card overflow-hidden divide-y divide-border">
-        {items.map((item) => {
+      {/* Menu */}
+      <motion.div
+        className="soft-card overflow-hidden"
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+      >
+        {MENU_ITEMS.map((item, i) => {
           const Icon = item.icon;
           return (
             <motion.button
               key={item.label}
-              className="p-4 w-full flex items-center gap-3 hover:bg-secondary/50 transition-colors"
+              className={`p-4 w-full flex items-center gap-3 hover:bg-secondary/50 transition-colors ${
+                i < MENU_ITEMS.length - 1 ? "border-b border-border" : ""
+              }`}
               onClick={() => setSubScreen(item.screen)}
               whileTap={{ scale: 0.98 }}
             >
               <div className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center">
-                <Icon className="w-[18px] h-[18px] text-muted-foreground" />
+                <Icon className={`w-[18px] h-[18px] ${item.color}`} />
               </div>
-              <span className="flex-1 text-left text-sm font-medium text-foreground">{item.label}</span>
+              <div className="flex-1 text-left">
+                <p className="text-sm font-semibold text-foreground">{item.label}</p>
+                <p className="text-xs text-muted-foreground">{item.desc}</p>
+              </div>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </motion.button>
           );
         })}
-      </div>
-    </motion.div>
-  );
-
-  return (
-    <div className="min-h-screen bg-background pb-24 px-4 pt-14">
-      {/* Account header */}
-      <motion.div
-        className="mb-8"
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <h1 className="font-display font-extrabold text-3xl text-foreground">Account</h1>
       </motion.div>
-
-      <MenuSection title="History" items={HISTORY_ITEMS} />
-      <MenuSection title="Vehicles and payment" items={VEHICLES_PAYMENT_ITEMS} />
-      <MenuSection title="Support and feedback" items={SUPPORT_ITEMS} />
 
       {/* Sign out */}
       <motion.button
-        className="flex items-center gap-2 mt-4 mx-auto text-sm text-muted-foreground hover:text-destructive transition-colors"
+        className="flex items-center gap-2 mt-8 mx-auto text-sm text-muted-foreground hover:text-destructive transition-colors"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
+        transition={{ delay: 0.5 }}
         onClick={() => toast({ title: "Signed out", description: "You've been signed out successfully." })}
       >
         <LogOut className="w-4 h-4" />

@@ -104,29 +104,35 @@ export default function SpotCard({ spot, onBook, onNavigate, onChat, compact = f
               <span className="font-display font-extrabold text-xl text-foreground">${spot.price.toFixed(2)}</span>
               <span className="text-xs text-muted-foreground">/hr</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex gap-2">
               {onChat && (
-                <button
+                <Button
+                  variant="ghost"
+                  size="icon"
                   aria-label="Chat with host"
-                  className="h-9 w-9 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                  className="h-9 w-9 rounded-full"
                   onClick={() => onChat(spot)}
                 >
                   <MessageCircle className="w-4 h-4" />
-                </button>
+                </Button>
               )}
-              <button
+              <Button
+                variant="ghost"
+                size="icon"
                 aria-label="Get directions"
-                className="h-9 w-9 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                className="h-9 w-9 rounded-full"
                 onClick={() => onNavigate(spot)}
               >
                 <Navigation className="w-4 h-4" />
-              </button>
-              <button
-                className="h-9 px-5 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity"
+              </Button>
+              <Button
+                variant="cta"
+                size="sm"
+                className="rounded-xl h-9 px-4"
                 onClick={() => onBook(spot)}
               >
                 Park
-              </button>
+              </Button>
             </div>
           </div>
         </div>
