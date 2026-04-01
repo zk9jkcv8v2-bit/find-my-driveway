@@ -25,6 +25,7 @@ export default function Index() {
   const [sheetExpanded, setSheetExpanded] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFocused, setSearchFocused] = useState(false);
+  const [searchExpanded, setSearchExpanded] = useState(false);
 
   const handleNavigate = (spot: SpotMarker) => {
     const url = `https://www.google.com/maps/dir/?api=1&destination=${spot.lat},${spot.lng}`;
@@ -85,30 +86,63 @@ export default function Index() {
           >
             {/* Search bar */}
             <motion.div
-              className="absolute top-12 left-4 right-4 z-20"
+              className="absolute top-12 left-4 z-20"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <div className="flex gap-2">
-                <div className="flex-1 flex items-center gap-3 bg-card rounded-full px-4 py-3 soft-shadow-lg">
-                  <Search className="w-4 h-4 text-muted-foreground shrink-0" />
-                  <input
-                    type="text"
-                    placeholder="Find parking nearby"
-                    aria-label="Search parking nearby"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onFocus={() => setSearchFocused(true)}
-                    onBlur={() => setSearchFocused(false)}
-                    className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
-                  />
-                  {searchQuery && (
-                    <button onClick={() => setSearchQuery("")} aria-label="Clear search">
+              <AnimatePresence mode="wait">
+                {searchExpanded ? (
+                  <motion.div
+                    key="expanded"
+                    className="flex items-center gap-3 bg-card rounded-full px-4 py-3 soft-shadow-lg"
+                    initial={{ width: 48 }}
+                    animate={{ width: "calc(100vw - 32px)" }}
+                    exit={{ width: 48 }}
+                    transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                  >
+                    <Search className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <motion.input
+                      autoFocus
+                      type="text"
+                      placeholder="Find parking nearby"
+                      aria-label="Search parking nearby"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onFocus={() => setSearchFocused(true)}
+                      onBlur={() => {
+                        setSearchFocused(false);
+                        if (!searchQuery) setSearchExpanded(false);
+                      }}
+                      className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none min-w-0"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.1 }}
+                    />
+                    <button
+                      onClick={() => {
+                        setSearchQuery("");
+                        setSearchExpanded(false);
+                      }}
+                      aria-label="Close search"
+                    >
                       <X className="w-4 h-4 text-muted-foreground" />
                     </button>
-                  )}
-                </div>
-              </div>
+                  </motion.div>
+                ) : (
+                  <motion.button
+                    key="collapsed"
+                    onClick={() => setSearchExpanded(true)}
+                    className="w-12 h-12 rounded-full bg-card soft-shadow-lg flex items-center justify-center"
+                    aria-label="Open search"
+                    whileTap={{ scale: 0.92 }}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                  >
+                    <Search className="w-5 h-5 text-foreground" />
+                  </motion.button>
+                )}
+              </AnimatePresence>
             </motion.div>
 
             {/* Map */}
