@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Check, Navigation, Star, Zap, Shield, Car, CreditCard, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,6 @@ interface BookingSheetProps {
 
 // 20 bars: each = 15 min increment → max 5h
 const SCRUBBER_COUNT = 20;
-const BAR_HEIGHTS = [22, 28, 20, 34, 26, 38, 30, 44, 36, 48, 48, 44, 38, 32, 28, 34, 24, 30, 22, 26];
 
 const MODES = ["Now", "Later", "Schedule"] as const;
 type Mode = typeof MODES[number];
@@ -22,6 +21,13 @@ export default function BookingSheet({ spot, onClose, onNavigate }: BookingSheet
   // index 3 = 4×15min = 60min default
   const [scrubberIndex, setScrubberIndex] = useState(3);
   const [confirmed, setConfirmed] = useState(false);
+  const [now, setNow] = useState(() => new Date());
+
+  // Keep "now" in sync so end time ticks in real time
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
 
   if (!spot) return null;
 
@@ -33,7 +39,6 @@ export default function BookingSheet({ spot, onClose, onNavigate }: BookingSheet
         ? `${durationHours}h`
         : `${Math.floor(durationHours)}h ${Math.round((durationHours % 1) * 60)}m`;
 
-  const now = new Date();
   const endTime = new Date(now.getTime() + durationHours * 60 * 60 * 1000);
   const endHH = endTime.getHours().toString().padStart(2, "0");
   const endMM = endTime.getMinutes().toString().padStart(2, "0");
@@ -163,18 +168,33 @@ export default function BookingSheet({ spot, onClose, onNavigate }: BookingSheet
                 </button>
               </p>
 
-              <AnimatePresence mode="wait">
-                <motion.p
-                  key={timeDisplay}
-                  className="font-display font-extrabold text-[80px] leading-none tracking-tight text-foreground"
-                  initial={{ opacity: 0, y: -16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 16 }}
-                  transition={{ duration: 0.13 }}
-                >
-                  {timeDisplay}
-                </motion.p>
-              </AnimatePresence>
+              <div className="flex items-center gap-1">
+                <AnimatePresence mode="popLayout">
+                  <motion.span
+                    key={endHH}
+                    className="font-display font-extrabold text-[80px] leading-none tracking-tight text-foreground tabular-nums"
+                    initial={{ y: -24, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: 24, opacity: 0 }}
+                    transition={{ type: "spring", damping: 20, stiffness: 300 }}
+                  >
+                    {endHH}
+                  </motion.span>
+                </AnimatePresence>
+                <span className="font-display font-extrabold text-[80px] leading-none tracking-tight text-foreground select-none">:</span>
+                <AnimatePresence mode="popLayout">
+                  <motion.span
+                    key={endMM}
+                    className="font-display font-extrabold text-[80px] leading-none tracking-tight text-foreground tabular-nums"
+                    initial={{ y: -24, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: 24, opacity: 0 }}
+                    transition={{ type: "spring", damping: 20, stiffness: 300 }}
+                  >
+                    {endMM}
+                  </motion.span>
+                </AnimatePresence>
+              </div>
 
               <motion.p
                 key={grandTotal}
@@ -188,15 +208,14 @@ export default function BookingSheet({ spot, onClose, onNavigate }: BookingSheet
 
               {/* Scrubber bars */}
               <div
-                className="flex items-end gap-[5px] mt-10 mb-2"
-                style={{ height: 60 }}
+                className="flex items-center gap-[5px] mt-10 mb-2"
                 role="slider"
                 aria-label="Select parking duration"
                 aria-valuemin={1}
                 aria-valuemax={SCRUBBER_COUNT}
                 aria-valuenow={scrubberIndex + 1}
               >
-                {BAR_HEIGHTS.map((h, i) => (
+                {Array.from({ length: SCRUBBER_COUNT }).map((_, i) => (
                   <motion.button
                     key={i}
                     onClick={() => setScrubberIndex(i)}
@@ -205,15 +224,13 @@ export default function BookingSheet({ spot, onClose, onNavigate }: BookingSheet
                       i === scrubberIndex
                         ? "bg-primary"
                         : i < scrubberIndex
-                          ? "bg-primary/35"
+                          ? "bg-primary/40"
                           : "bg-border"
                     }`}
-                    style={{
-                      width: i === scrubberIndex ? 5 : 4,
-                      height: i === scrubberIndex ? h + 10 : h,
-                    }}
+                    style={{ width: 8, height: i === scrubberIndex ? 28 : 8 }}
+                    animate={{ height: i === scrubberIndex ? 28 : 8 }}
+                    transition={{ type: "spring", damping: 18, stiffness: 300 }}
                     whileTap={{ scale: 0.85 }}
-                    transition={{ duration: 0.1 }}
                   />
                 ))}
               </div>

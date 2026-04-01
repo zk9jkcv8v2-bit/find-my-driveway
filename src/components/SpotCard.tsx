@@ -18,7 +18,7 @@ export default function SpotCard({ spot, onBook, onNavigate, onChat, compact = f
   if (compact) {
     return (
       <motion.button
-        className="soft-card p-3 w-[200px] shrink-0 text-left snap-start focus-visible:ring-2 focus-visible:ring-primary"
+        className="soft-card w-[200px] shrink-0 text-left snap-start focus-visible:ring-2 focus-visible:ring-primary overflow-hidden"
         aria-label={`Book ${spot.address} for $${spot.price.toFixed(2)}/hr`}
         whileTap={{ scale: 0.97 }}
         whileHover={{ y: -3, boxShadow: "0 6px 20px rgba(0,0,0,0.08)" }}
@@ -26,19 +26,43 @@ export default function SpotCard({ spot, onBook, onNavigate, onChat, compact = f
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <div className="flex items-start justify-between mb-2">
-          <span className="text-lg">{typeEmoji}</span>
-          <div className="flex items-center gap-0.5">
-            <Star className="w-3 h-3 text-warning fill-warning" />
-            <span className="text-xs font-medium text-foreground">{spot.rating}</span>
+        {/* Spot image */}
+        {spot.image ? (
+          <img
+            src={spot.image}
+            alt={spot.address}
+            className="w-full h-[90px] object-cover"
+            onError={(e) => { e.currentTarget.style.display = "none"; }}
+          />
+        ) : (
+          <div className="w-full h-[90px] bg-secondary flex items-center justify-center">
+            <span className="text-2xl">{typeEmoji}</span>
           </div>
-        </div>
-        <p className="text-sm font-semibold text-foreground truncate">{spot.address}</p>
-        <p className="text-xs text-muted-foreground mb-2">{spot.distance} · {typeLabel}</p>
-        <div className="flex items-center gap-1.5">
-          <span className="font-display font-bold text-primary text-lg">${spot.price.toFixed(2)}</span>
-          <span className="text-xs text-muted-foreground">/hr</span>
-          {spot.hasEV && <Zap className="w-3.5 h-3.5 text-accent ml-auto" />}
+        )}
+
+        <div className="p-3">
+          {/* Host row */}
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <img
+              src={spot.host.avatar}
+              alt={spot.host.name}
+              className="w-5 h-5 rounded-full object-cover shrink-0"
+              onError={(e) => { e.currentTarget.style.display = "none"; }}
+            />
+            <span className="text-[11px] text-muted-foreground truncate">{spot.host.name}</span>
+            <div className="flex items-center gap-0.5 ml-auto shrink-0">
+              <Star className="w-3 h-3 text-warning fill-warning" />
+              <span className="text-xs font-medium text-foreground">{spot.rating}</span>
+            </div>
+          </div>
+
+          <p className="text-sm font-semibold text-foreground truncate">{spot.address.split(",")[0]}</p>
+          <p className="text-xs text-muted-foreground mb-2">{spot.distance} · {typeLabel}</p>
+          <div className="flex items-center gap-1.5">
+            <span className="font-display font-bold text-primary text-lg">${spot.price.toFixed(2)}</span>
+            <span className="text-xs text-muted-foreground">/hr</span>
+            {spot.hasEV && <Zap className="w-3.5 h-3.5 text-accent ml-auto" />}
+          </div>
         </div>
       </motion.button>
     );
