@@ -29,7 +29,7 @@ export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
                 onClick={() => onTabChange(tab.id)}
                 aria-label={tab.label}
                 aria-current={isActive ? "page" : undefined}
-                className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-md shadow-primary/25 relative -top-3 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                className="w-11 h-11 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-md shadow-primary/25 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                 whileTap={{ scale: 0.92 }}
                 whileHover={{ scale: 1.05 }}
               >
