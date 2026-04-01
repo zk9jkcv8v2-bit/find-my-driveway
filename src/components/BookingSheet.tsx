@@ -3,6 +3,7 @@ import { X, Clock, Calendar, Zap, Check, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { SpotMarker } from "./spots-data";
 import { useState } from "react";
+import ParkingSessionSheet from "./ParkingSessionSheet";
 
 interface BookingSheetProps {
   spot: SpotMarker | null;
@@ -20,6 +21,7 @@ export default function BookingSheet({ spot, onClose, onNavigate }: BookingSheet
   const [selectedTime, setSelectedTime] = useState(0);
   const [duration, setDuration] = useState(2);
   const [confirmed, setConfirmed] = useState(false);
+  const [showSession, setShowSession] = useState(false);
 
   if (!spot) return null;
 
@@ -33,6 +35,14 @@ export default function BookingSheet({ spot, onClose, onNavigate }: BookingSheet
     }
     onClose();
   };
+
+  const handleConfirm = () => {
+    setShowSession(true);
+  };
+
+  if (showSession) {
+    return <ParkingSessionSheet spot={spot} onClose={onClose} />;
+  }
 
   return (
     <AnimatePresence>
@@ -67,7 +77,7 @@ export default function BookingSheet({ spot, onClose, onNavigate }: BookingSheet
           {!confirmed ? (
             <>
               <div className="mb-6">
-                <h2 className="font-display font-bold text-lg text-foreground">Book Parking</h2>
+                <h2 className="font-display font-bold text-lg text-foreground">Park Here</h2>
                 <p className="text-sm text-muted-foreground">{spot.address}</p>
               </div>
 
@@ -138,9 +148,12 @@ export default function BookingSheet({ spot, onClose, onNavigate }: BookingSheet
                 </div>
               </div>
 
-              <Button variant="cta" size="xl" className="w-full rounded-2xl" onClick={() => setConfirmed(true)}>
-                Confirm Parking · ${grandTotal.toFixed(2)}
-              </Button>
+              <button
+                className="w-full h-14 rounded-2xl bg-primary text-primary-foreground font-semibold text-base hover:opacity-90 transition-opacity"
+                onClick={handleConfirm}
+              >
+                Park · ${grandTotal.toFixed(2)}
+              </button>
             </>
           ) : (
             <motion.div
