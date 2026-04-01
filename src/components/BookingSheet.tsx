@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Check, Navigation, Star, Zap, Shield, Car, CreditCard, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,18 +10,67 @@ interface BookingSheetProps {
   onNavigate?: (spot: SpotMarker) => void;
 }
 
-// 20 bars: each = 15 min increment → max 5h
-const SCRUBBER_COUNT = 20;
+// Duration drum config
+const TICK_COUNT = 20;        // 15-min increments → max 5h
+const TICK_STEP = 16;         // px per tick (center to center)
+const DRUM_WIDTH = 300;       // visible viewport width
+const DRUM_HALF = DRUM_WIDTH / 2;
+const MAX_TICK_H = 40;
+const MIN_TICK_H = 4;
+
+/** Bell-curve height: tallest at center, fades toward edges */
+function drumTickHeight(pixelDistFromCenter: number): number {
+  const ratio = Math.min(pixelDistFromCenter / DRUM_HALF, 1);
+  const curve = 1 - ratio * ratio;          // quadratic falloff
+  return MIN_TICK_H + (MAX_TICK_H - MIN_TICK_H) * Math.max(curve, 0);
+}
+
+/** Opacity: bright at center, fades toward edges */
+function drumTickOpacity(pixelDistFromCenter: number): number {
+  const ratio = Math.min(pixelDistFromCenter / DRUM_HALF, 1);
+  return 1 - ratio * 0.7;
+}
 
 const MODES = ["Now", "Later", "Schedule"] as const;
 type Mode = typeof MODES[number];
 
 export default function BookingSheet({ spot, onClose, onNavigate }: BookingSheetProps) {
   const [mode, setMode] = useState<Mode>("Now");
-  // index 3 = 4×15min = 60min default
-  const [scrubberIndex, setScrubberIndex] = useState(3);
   const [confirmed, setConfirmed] = useState(false);
   const [now, setNow] = useState(() => new Date());
+
+  // ── Duration drum state ──
+  const DEFAULT_INDEX = 3; // 4×15min = 60min
+  const [scrollPos, setScrollPos] = useState(DEFAULT_INDEX);   // float during drag
+  const [isDragging, setIsDragging] = useState(false);
+  const dragRef = useRef({ startX: 0, startPos: 0 });
+
+  const scrubberIndex = isDragging ? Math.round(scrollPos) : Math.round(scrollPos);
+
+  const handleDrumDown = useCallback((e: React.PointerEvent) => {
+    dragRef.current = { startX: e.clientX, startPos: scrollPos };
+    setIsDragging(true);
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  }, [scrollPos]);
+
+  const handleDrumMove = useCallback((e: React.PointerEvent) => {
+    if (!isDragging) return;
+    const dx = e.clientX - dragRef.current.startX;
+    const indexDelta = -dx / TICK_STEP;
+    const newPos = dragRef.current.startPos + indexDelta;
+    setScrollPos(Math.max(0, Math.min(TICK_COUNT - 1, newPos)));
+  }, [isDragging]);
+
+  const handleDrumUp = useCallback(() => {
+    setIsDragging(false);
+    const snapped = Math.max(0, Math.min(TICK_COUNT - 1, Math.round(scrollPos)));
+    setScrollPos(snapped);
+  }, [scrollPos]);
+
+  const handleTickTap = useCallback((i: number) => {
+    if (isDragging) return;
+    setScrollPos(i);
+  }, [isDragging]);
 
   // Keep "now" in sync so end time ticks in real time
   useEffect(() => {
@@ -206,33 +255,59 @@ export default function BookingSheet({ spot, onClose, onNavigate }: BookingSheet
                 {" · "}{durationLabel}
               </motion.p>
 
-              {/* Scrubber bars */}
+              {/* ── Duration drum ── */}
               <div
-                className="flex items-center gap-[5px] mt-10 mb-2"
+                className="relative mt-10 mb-2 touch-none select-none cursor-grab active:cursor-grabbing"
+                style={{ width: DRUM_WIDTH, height: MAX_TICK_H + 8 }}
                 role="slider"
                 aria-label="Select parking duration"
                 aria-valuemin={1}
-                aria-valuemax={SCRUBBER_COUNT}
+                aria-valuemax={TICK_COUNT}
                 aria-valuenow={scrubberIndex + 1}
+                onPointerDown={handleDrumDown}
+                onPointerMove={handleDrumMove}
+                onPointerUp={handleDrumUp}
+                onPointerCancel={handleDrumUp}
               >
-                {Array.from({ length: SCRUBBER_COUNT }).map((_, i) => (
-                  <motion.button
-                    key={i}
-                    onClick={() => setScrubberIndex(i)}
-                    aria-label={`${((i + 1) * 0.25 < 1) ? `${(i + 1) * 15} min` : `${((i + 1) * 0.25).toFixed(2).replace(/\.00$/, "")}h`}`}
-                    className={`rounded-full transition-colors ${
-                      i === scrubberIndex
-                        ? "bg-primary"
-                        : i < scrubberIndex
-                          ? "bg-primary/40"
-                          : "bg-border"
-                    }`}
-                    style={{ width: 8, height: i === scrubberIndex ? 28 : 8 }}
-                    animate={{ height: i === scrubberIndex ? 28 : 8 }}
-                    transition={{ type: "spring", damping: 18, stiffness: 300 }}
-                    whileTap={{ scale: 0.85 }}
-                  />
-                ))}
+                {/* Fade masks on edges */}
+                <div className="absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-card to-transparent z-10 pointer-events-none" />
+                <div className="absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-card to-transparent z-10 pointer-events-none" />
+
+                {/* Tick strip — each slot is TICK_STEP wide, strip slides so scrollPos tick is centered */}
+                <motion.div
+                  className="absolute top-0 bottom-0 flex items-center"
+                  animate={{ x: DRUM_HALF - scrollPos * TICK_STEP - TICK_STEP / 2 }}
+                  transition={isDragging ? { duration: 0 } : { type: "spring", damping: 28, stiffness: 350 }}
+                >
+                  {Array.from({ length: TICK_COUNT }).map((_, i) => {
+                    const pxFromCenter = (i - scrollPos) * TICK_STEP;
+                    const dist = Math.abs(pxFromCenter);
+                    const h = drumTickHeight(dist);
+                    const opacity = drumTickOpacity(dist);
+                    const isCenter = Math.abs(i - scrollPos) < 0.5;
+
+                    return (
+                      <div
+                        key={i}
+                        className="shrink-0 flex items-center justify-center"
+                        style={{ width: TICK_STEP, height: MAX_TICK_H + 8 }}
+                        onClick={() => handleTickTap(i)}
+                      >
+                        <div
+                          className={`rounded-full ${
+                            isCenter ? "bg-primary" : "bg-muted-foreground/20"
+                          }`}
+                          style={{
+                            width: isCenter ? 5 : 3,
+                            height: Math.round(h),
+                            opacity,
+                            transition: "height 80ms ease-out, width 80ms ease-out, opacity 80ms ease-out",
+                          }}
+                        />
+                      </div>
+                    );
+                  })}
+                </motion.div>
               </div>
               <p className="text-xs text-muted-foreground">Maximum 5 hours</p>
             </div>
