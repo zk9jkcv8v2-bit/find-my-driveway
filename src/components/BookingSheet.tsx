@@ -1,8 +1,8 @@
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Clock, Calendar, Zap, Check, Navigation } from "lucide-react";
+import { ArrowLeft, Check, Navigation, Star, Zap, Shield, Car, CreditCard, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { SpotMarker } from "./spots-data";
-import { useState } from "react";
 
 interface BookingSheetProps {
   spot: SpotMarker | null;
@@ -10,157 +10,250 @@ interface BookingSheetProps {
   onNavigate?: (spot: SpotMarker) => void;
 }
 
-const TIME_OPTIONS = [
-  { label: "Now", icon: Zap, sub: "Start immediately" },
-  { label: "Later", icon: Clock, sub: "Pick a time" },
-  { label: "Schedule", icon: Calendar, sub: "Book ahead" },
-];
+// 20 bars: each = 15 min increment → max 5h
+const SCRUBBER_COUNT = 20;
+const BAR_HEIGHTS = [22, 28, 20, 34, 26, 38, 30, 44, 36, 48, 48, 44, 38, 32, 28, 34, 24, 30, 22, 26];
+
+const MODES = ["Now", "Later", "Schedule"] as const;
+type Mode = typeof MODES[number];
 
 export default function BookingSheet({ spot, onClose, onNavigate }: BookingSheetProps) {
-  const [selectedTime, setSelectedTime] = useState(0);
-  const [duration, setDuration] = useState(2);
+  const [mode, setMode] = useState<Mode>("Now");
+  // index 3 = 4×15min = 60min default
+  const [scrubberIndex, setScrubberIndex] = useState(3);
   const [confirmed, setConfirmed] = useState(false);
 
   if (!spot) return null;
 
-  const total = spot.price * duration;
+  const durationHours = (scrubberIndex + 1) * 0.25;
+  const durationLabel =
+    durationHours < 1
+      ? `${Math.round(durationHours * 60)} min`
+      : durationHours % 1 === 0
+        ? `${durationHours}h`
+        : `${Math.floor(durationHours)}h ${Math.round((durationHours % 1) * 60)}m`;
+
+  const now = new Date();
+  const endTime = new Date(now.getTime() + durationHours * 60 * 60 * 1000);
+  const endHH = endTime.getHours().toString().padStart(2, "0");
+  const endMM = endTime.getMinutes().toString().padStart(2, "0");
+  const timeDisplay = `${endHH}:${endMM}`;
+
+  const total = spot.price * durationHours;
   const serviceFee = Math.round(total * 0.1 * 100) / 100;
   const grandTotal = total + serviceFee;
 
+  const typeLabel =
+    spot.type === "garage" ? "🏢 Garage" :
+    spot.type === "driveway" ? "🏠 Driveway" : "🅿️ Open lot";
+
   const handleGetDirections = () => {
-    if (onNavigate) {
-      onNavigate(spot);
-    }
+    if (onNavigate) onNavigate(spot);
     onClose();
   };
 
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 z-50 flex items-end justify-center"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 bg-card flex flex-col"
+        initial={{ y: "100%" }}
+        animate={{ y: 0 }}
+        exit={{ y: "100%" }}
+        transition={{ type: "spring", damping: 30, stiffness: 350 }}
       >
-        <motion.div
-          className="absolute inset-0 bg-foreground/20 backdrop-blur-[2px]"
-          onClick={onClose}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        />
-
-        <motion.div
-          className="relative w-full max-w-lg bg-card rounded-t-3xl p-5 pb-8 soft-shadow-xl"
-          initial={{ y: "100%" }}
-          animate={{ y: 0 }}
-          exit={{ y: "100%" }}
-          transition={{ type: "spring", damping: 28, stiffness: 350 }}
-        >
-          <div className="flex justify-center mb-3">
-            <div className="w-10 h-1 rounded-full bg-border" />
-          </div>
-
-          <button onClick={onClose} aria-label="Close booking" className="absolute top-4 right-4 w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-primary">
-            <X className="w-4 h-4" />
-          </button>
-
-          {!confirmed ? (
-            <>
-              <div className="mb-6">
-                <h2 className="font-display font-bold text-lg text-foreground">Book Parking</h2>
-                <p className="text-sm text-muted-foreground">{spot.address}</p>
+        {confirmed ? (
+          /* ────────────── Confirmation screen ────────────── */
+          <motion.div
+            className="flex-1 flex flex-col items-center justify-center text-center px-8"
+            initial={{ scale: 0.92, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", damping: 15, stiffness: 200 }}
+          >
+            <motion.div
+              className="w-20 h-20 rounded-full bg-accent/10 flex items-center justify-center mb-5"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", damping: 12, stiffness: 200, delay: 0.1 }}
+            >
+              <Check className="w-10 h-10 text-accent" />
+            </motion.div>
+            <h2 className="font-display font-extrabold text-2xl text-foreground mb-2">You're all set!</h2>
+            <p className="text-muted-foreground text-sm mb-1">{spot.address}</p>
+            <p className="text-muted-foreground text-sm mb-8">
+              Ends at <span className="text-foreground font-semibold">{timeDisplay}</span>
+              {" · "}
+              <span className="text-foreground font-semibold">${grandTotal.toFixed(2)}</span>
+            </p>
+            <Button variant="cta" size="xl" className="w-full rounded-2xl gap-2 mb-3" onClick={handleGetDirections}>
+              <Navigation className="w-4 h-4" />
+              Get Directions
+            </Button>
+            <button onClick={onClose} className="text-sm text-muted-foreground underline-offset-2 hover:underline">
+              Back to map
+            </button>
+          </motion.div>
+        ) : (
+          <>
+            {/* ────────── Header ────────── */}
+            <div className="pt-14 px-4 pb-3 flex items-start gap-3 shrink-0">
+              <button
+                onClick={onClose}
+                aria-label="Back"
+                className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center shrink-0 mt-0.5 focus-visible:ring-2 focus-visible:ring-primary"
+              >
+                <ArrowLeft className="w-4 h-4 text-foreground" />
+              </button>
+              <div className="flex-1 min-w-0">
+                <h2 className="font-display font-bold text-lg leading-tight text-foreground truncate">
+                  {spot.address.split(",")[0]?.trim()}
+                </h2>
+                <p className="text-sm text-muted-foreground mt-0.5 truncate">
+                  {spot.address} · <span className="text-accent font-medium">Open</span>
+                </p>
               </div>
-
-              <div className="grid grid-cols-3 gap-3 mb-5">
-                {TIME_OPTIONS.map((opt, i) => {
-                  const Icon = opt.icon;
-                  return (
-                    <motion.button
-                      key={opt.label}
-                      onClick={() => setSelectedTime(i)}
-                      aria-label={opt.label}
-                      aria-pressed={selectedTime === i}
-                      className={`flex flex-col items-center gap-1 p-4 rounded-2xl border-2 transition-all focus-visible:ring-2 focus-visible:ring-primary ${
-                        selectedTime === i
-                          ? "border-primary bg-primary/5"
-                          : "border-border hover:border-primary/30"
-                      }`}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <Icon className={`w-5 h-5 ${selectedTime === i ? "text-primary" : "text-muted-foreground"}`} />
-                      <span className={`text-xs font-semibold ${selectedTime === i ? "text-primary" : "text-foreground"}`}>{opt.label}</span>
-                    </motion.button>
-                  );
-                })}
+              <div className="flex items-center gap-1 shrink-0 mt-1">
+                <Star className="w-3.5 h-3.5 fill-warning text-warning" />
+                <span className="text-sm font-semibold text-foreground">{spot.rating}</span>
               </div>
+            </div>
 
-              <div className="flex items-center justify-between bg-secondary rounded-2xl p-5 mb-5">
-                <span className="text-sm font-medium text-foreground">Duration</span>
-                <div className="flex items-center gap-4">
+            {/* ────────── Tariff row ────────── */}
+            <div className="flex items-center justify-between px-4 py-3 border-t border-b border-border shrink-0">
+              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                <span>{typeLabel}</span>
+                {spot.hasSecurity && (
+                  <span className="flex items-center gap-1 text-primary text-xs">
+                    <Shield className="w-3 h-3" /> Secured
+                  </span>
+                )}
+                {spot.hasEV && (
+                  <span className="flex items-center gap-1 text-accent text-xs">
+                    <Zap className="w-3 h-3" /> EV Charging
+                  </span>
+                )}
+              </div>
+              <p className="text-sm font-semibold text-foreground">${spot.price.toFixed(2)}/hr</p>
+            </div>
+
+            {/* ────────── Mode tabs ────────── */}
+            <div className="flex gap-2 px-4 pt-5 pb-1 shrink-0">
+              {MODES.map((m) => (
+                <motion.button
+                  key={m}
+                  onClick={() => setMode(m)}
+                  aria-pressed={mode === m}
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-primary ${
+                    mode === m
+                      ? "bg-foreground text-background"
+                      : "bg-secondary text-muted-foreground hover:text-foreground"
+                  }`}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {m}
+                </motion.button>
+              ))}
+            </div>
+
+            {/* ────────── Time display + scrubber ────────── */}
+            <div className="flex-1 flex flex-col items-center justify-center px-6">
+              <p className="text-sm text-muted-foreground mb-2">
+                Parking ends{" "}
+                <button className="text-foreground font-semibold inline-flex items-center gap-1 underline-offset-2">
+                  Today <ChevronDown className="w-3.5 h-3.5" />
+                </button>
+              </p>
+
+              <AnimatePresence mode="wait">
+                <motion.p
+                  key={timeDisplay}
+                  className="font-display font-extrabold text-[80px] leading-none tracking-tight text-foreground"
+                  initial={{ opacity: 0, y: -16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 16 }}
+                  transition={{ duration: 0.13 }}
+                >
+                  {timeDisplay}
+                </motion.p>
+              </AnimatePresence>
+
+              <motion.p
+                key={grandTotal}
+                className="text-sm text-muted-foreground mt-3"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <span className="font-semibold text-foreground">${grandTotal.toFixed(2)}</span>
+                {" · "}{durationLabel}
+              </motion.p>
+
+              {/* Scrubber bars */}
+              <div
+                className="flex items-end gap-[5px] mt-10 mb-2"
+                style={{ height: 60 }}
+                role="slider"
+                aria-label="Select parking duration"
+                aria-valuemin={1}
+                aria-valuemax={SCRUBBER_COUNT}
+                aria-valuenow={scrubberIndex + 1}
+              >
+                {BAR_HEIGHTS.map((h, i) => (
                   <motion.button
-                    onClick={() => setDuration(Math.max(1, duration - 1))}
-                    aria-label="Decrease duration"
-                    className="w-10 h-10 rounded-full bg-card border border-border text-foreground flex items-center justify-center font-bold text-lg active:bg-secondary transition-colors focus-visible:ring-2 focus-visible:ring-primary"
+                    key={i}
+                    onClick={() => setScrubberIndex(i)}
+                    aria-label={`${((i + 1) * 0.25 < 1) ? `${(i + 1) * 15} min` : `${((i + 1) * 0.25).toFixed(2).replace(/\.00$/, "")}h`}`}
+                    className={`rounded-full transition-colors ${
+                      i === scrubberIndex
+                        ? "bg-primary"
+                        : i < scrubberIndex
+                          ? "bg-primary/35"
+                          : "bg-border"
+                    }`}
+                    style={{
+                      width: i === scrubberIndex ? 5 : 4,
+                      height: i === scrubberIndex ? h + 10 : h,
+                    }}
                     whileTap={{ scale: 0.85 }}
-                  >−</motion.button>
-                  <AnimatePresence mode="wait">
-                    <motion.span
-                      key={duration}
-                      className="font-display font-bold text-lg text-foreground w-8 text-center"
-                      initial={{ opacity: 0, y: -8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 8 }}
-                      transition={{ duration: 0.12 }}
-                    >{duration}h</motion.span>
-                  </AnimatePresence>
-                  <motion.button
-                    onClick={() => setDuration(Math.min(12, duration + 1))}
-                    aria-label="Increase duration"
-                    className="w-10 h-10 rounded-full bg-card border border-border text-foreground flex items-center justify-center font-bold text-lg active:bg-secondary transition-colors focus-visible:ring-2 focus-visible:ring-primary"
-                    whileTap={{ scale: 0.85 }}
-                  >+</motion.button>
-                </div>
+                    transition={{ duration: 0.1 }}
+                  />
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground">Maximum 5 hours</p>
+            </div>
+
+            {/* ────────── Bottom: selectors + confirm ────────── */}
+            <div className="px-4 pb-10 shrink-0 space-y-3">
+              {/* Vehicle + Payment */}
+              <div className="flex gap-2">
+                <button
+                  className="flex-1 flex items-center gap-2 bg-secondary rounded-xl px-3 py-3 focus-visible:ring-2 focus-visible:ring-primary"
+                  aria-label="Select vehicle"
+                >
+                  <Car className="w-4 h-4 text-muted-foreground shrink-0" />
+                  <span className="text-sm text-foreground flex-1 text-left truncate">Tesla Model 3</span>
+                  <ChevronDown className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                </button>
+                <button
+                  className="flex-1 flex items-center gap-2 bg-secondary rounded-xl px-3 py-3 focus-visible:ring-2 focus-visible:ring-primary"
+                  aria-label="Select payment"
+                >
+                  <CreditCard className="w-4 h-4 text-muted-foreground shrink-0" />
+                  <span className="text-sm text-foreground flex-1 text-left truncate">Visa •••• 1234</span>
+                  <ChevronDown className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                </button>
               </div>
 
-              <div className="space-y-2 mb-6">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">${spot.price} × {duration} hours</span>
-                  <span className="text-foreground">${total.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Service fee</span>
-                  <span className="text-foreground">${serviceFee.toFixed(2)}</span>
-                </div>
-                <div className="h-px bg-border my-2" />
-                <div className="flex justify-between">
-                  <span className="font-semibold text-foreground">Total</span>
-                  <span className="font-display font-extrabold text-lg text-foreground">${grandTotal.toFixed(2)}</span>
-                </div>
-              </div>
-
-              <Button variant="cta" size="xl" className="w-full rounded-2xl" onClick={() => setConfirmed(true)}>
+              {/* Confirm */}
+              <Button
+                variant="cta"
+                size="xl"
+                className="w-full rounded-2xl text-base"
+                onClick={() => setConfirmed(true)}
+              >
                 Confirm Parking · ${grandTotal.toFixed(2)}
               </Button>
-            </>
-          ) : (
-            <motion.div
-              className="text-center py-8"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: "spring", damping: 15, stiffness: 200 }}
-            >
-              <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
-                <Check className="w-8 h-8 text-accent" />
-              </div>
-              <h2 className="font-display font-bold text-xl text-foreground mb-1">You're all set!</h2>
-              <p className="text-muted-foreground text-sm mb-6">{spot.address} · {duration}h · ${grandTotal.toFixed(2)}</p>
-              <Button variant="cta" size="lg" className="w-full rounded-2xl gap-2" onClick={handleGetDirections}>
-                <Navigation className="w-4 h-4" />
-                Get Directions
-              </Button>
-            </motion.div>
-          )}
-        </motion.div>
+            </div>
+          </>
+        )}
       </motion.div>
     </AnimatePresence>
   );
